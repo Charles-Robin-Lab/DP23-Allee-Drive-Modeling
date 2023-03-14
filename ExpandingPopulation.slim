@@ -1,0 +1,70 @@
+initialize() {
+	defineConstant("globalScaler", 2.0);
+	defineConstant("dispertionStandardDeviation", 0.01/globalScaler);
+	defineConstant("densityCheckRange", 0.05/globalScaler);
+	defineConstant("densityStrength", 0.08);
+
+	initializeSLiMModelType("nonWF");
+	initializeSLiMOptions(dimensionality="xy");
+	
+	initializeMutationRate(1e-7);
+	initializeMutationType("m1", 0.5, "f", 0.0);
+	initializeGenomicElementType("g1", m1, 1.0);
+	initializeGenomicElement(g1, 0, 99999);
+	initializeRecombinationRate(1e-8);
+	
+	//density dependendant reproduction
+	initializeInteractionType(1, "xy", reciprocal=T, maxDistance=densityCheckRange);
+	i1.setInteractionFunction("l", densityStrength);
+	
+   // spatial mate choice
+   initializeInteractionType(2, "xy", reciprocal=T, maxDistance=0.08/globalScaler);
+   i2.setInteractionFunction("n", 1.0/globalScaler, 0.02/globalScaler);
+}
+
+function (void)lateInitalise(void) {
+	sim.addSubpop("p1", 10);
+	for (ind in p1.individuals)
+	{
+		newPos = c(0.5,0.5)+runif(2,-0.05/globalScaler,0.05/globalScaler);
+		ind.setSpatialPosition(newPos);
+	}
+}
+
+function (void)finishSimulation(void) {
+	sim.outputFixedMutations();
+}
+
+1 late() {lateInitalise();}
+800 late() {finishSimulation();}
+
+late() {
+	//kill old		
+	inds = sim.subpopulations.individuals; 
+	sim.killIndividuals(inds[inds.age > 1]);
+	//carrying capacity
+	//p1.fitnessScaling = p1.getValue("carryingCapacity") / p1.individualCount;
+	i1.evaluate(p1);
+   i2.evaluate(p1);
+		
+}
+
+reproduction() {
+	strength = i1.totalOfNeighborStrengths(individual);
+	if (runif(1) >= strength) {
+		mate = i2.nearestInteractingNeighbors(individual,1);
+		
+		breaksIndividual = sim.chromosome.drawBreakpoints();
+		breaksMate = sim.chromosome.drawBreakpoints();
+		if (size(mate)==1) {
+			child = subpop.addRecombinant(individual.genome1, individual.genome2, breaksIndividual, mate.genome1, mate.genome2, breaksMate);
+			pos = individual.spatialPosition + rnorm(2, 0, dispertionStandardDeviation);
+			pos = p1.pointReflected(pos);
+			child.setSpatialPosition(pos);
+		}
+		
+		//	totalStrength = i1.totalOfNeighborStrengths(individual);
+			
+		//	child.fitnessScaling = 0.7 - totalStrength / p1.individualCount;
+	}
+}
