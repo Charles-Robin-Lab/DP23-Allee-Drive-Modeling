@@ -1,0 +1,97 @@
+initialize() {
+	
+	initializeSLiMModelType("nonWF");
+	defineConstant("mutsFrequency",0.13);
+	defineConstant("mutsHetFitness",0.000);
+	defineConstant("mutsCount",14);
+	defineConstant("homozygousSterilityChance",1.0);
+	defineConstant("genomeSize",99999);
+	defineConstant("migrantsSize",20);
+	
+	initializeMutationRate(0.0);
+	initializeMutationType("m0", 0.5, "f", 0.0);
+	initializeGenomicElementType("g0", m0, 1.0);
+	initializeGenomicElement(g0, 0, genomeSize);
+	initializeRecombinationRate(1e-8);
+	
+	initializeSex("X");
+	for (i in 1:mutsCount) {
+		mut = initializeMutationType("m"+asString(i) , 1.0, "f", mutsHetFitness);
+		mut.color = "green"; 
+//		gelement = initializeGenomicElementType("g"+asString(i), mut, 1.0);
+//		initializeGenomicElement(gelement, asInteger(genomeSize/mutsCount*(i-1)), asInteger(genomeSize/mutsCount*i-1));
+	}
+}
+
+1 early() {
+	sim.addSubpop(0, 500);
+	sim.subpopulations[0].setValue("carryingCapacity",1000);
+	sim.addSubpop(1, 0);
+	sim.subpopulations[1].setValue("carryingCapacity",500);
+}
+
+early() {
+	//kill old individuals
+	inds = sim.subpopulations.individuals; 
+	sim.killIndividuals(inds[inds.age > 2]);
+
+	//carrying capacity for populations because limited resources
+	for (i in 0:1){
+		p = sim.subpopulations[i];
+		p.fitnessScaling = p.getValue("carryingCapacity") / p.individualCount;
+	}
+}
+
+
+10 late() {
+	muts = community.allMutationTypes;
+	allXs = sim.subpopulations.individuals.genomes[!(sim.subpopulations.individuals.genomes.isNullGenome)];
+	for (i in 0:(mutsCount-1)) {
+		
+		sample(
+			allXs, 
+			asInteger(mutsFrequency*size(allXs))
+		).addNewDrawnMutation(muts[i], asInteger(genomeSize/mutsCount*i));
+	}
+}
+11 late() {
+	migrants = sample(sim.subpopulations[0].individuals, migrantsSize);
+	sim.subpopulations[1].takeMigrants(migrants);
+}
+
+
+30:10000 late() {
+	//end condiotion
+	if (sim.countOfMutationsOfType(m3) == 0) {
+		fixed = any(sim.substitutions.mutationType == m3);
+		cat(ifelse(fixed, "FIXED\n", "LOST\n"));
+		sim.simulationFinished();
+	}
+}
+
+reproduction(NULL, "F") {
+	copies = copiesOfMutations(individual, community.allMutationTypes);
+	individual.color =  rgb2color(c(sum(copies)/size(copies), 1.0 - sum(copies)/size(copies),0.1));
+	if (size(copies[copies>=2]) != 0)
+		return;
+	mate = subpop.sampleIndividuals(1, sex="M");		
+	subpop.addCrossed(individual, mate);
+}
+
+function (integer)copiesOfMutations(o<Individual>$ ind, o<MutationType> mutTypes) {	
+	out = c();
+	for (mutType in mutTypes) {
+		mut = sim.mutationsOfType(mutType);
+		//mutation present
+		if (size(mut) != 1) {
+			out = c(out,0);
+			next;
+		}
+			
+		//copies
+		hasMutOnChromosome1 = ind.genome1.containsMutations(mut);
+		hasMutOnChromosome2 = ind.genome2.containsMutations(mut);
+		out = c(out, asInteger(hasMutOnChromosome1) + asInteger(hasMutOnChromosome2));
+	}
+	return out;
+}
