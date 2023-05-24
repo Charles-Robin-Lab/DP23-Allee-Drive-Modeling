@@ -57,16 +57,23 @@ early() {
 11 late() {
 	migrants = sample(sim.subpopulations[0].individuals, migrantsSize);
 	sim.subpopulations[1].takeMigrants(migrants);
+	// kill since no longer needed
+	sim.killIndividuals(sim.subpopulations[0].individuals);
 }
 
 
 30:10000 late() {
-	//end condiotion
-	if (sim.countOfMutationsOfType(m3) == 0) {
-		fixed = any(sim.substitutions.mutationType == m3);
-		cat(ifelse(fixed, "FIXED\n", "LOST\n"));
+	//end condition 1: population crash
+	if (size(sim.subpopulations[1].individuals) == 0) {
+		cat("EXTINCT\n");
 		sim.simulationFinished();
 	}
+}
+250 late() {
+	//end condition 2: survival
+	cat(ifelse(size(sim.subpopulations[1].individuals) >= 150,"SURVIVED\n","UNDECIDED\n"));
+	sim.simulationFinished();
+
 }
 
 reproduction(NULL, "F") {
@@ -74,8 +81,10 @@ reproduction(NULL, "F") {
 	individual.color =  rgb2color(c(sum(copies)/size(copies), 1.0 - sum(copies)/size(copies),0.1));
 	if (size(copies[copies>=2]) != 0)
 		return;
-	mate = subpop.sampleIndividuals(1, sex="M");		
-	subpop.addCrossed(individual, mate);
+	mate = subpop.sampleIndividuals(1, sex="M");	
+	if (size(mate)==1) {
+		subpop.addCrossed(individual, mate);
+	}	
 }
 
 function (integer)copiesOfMutations(o<Individual>$ ind, o<MutationType> mutTypes) {	
