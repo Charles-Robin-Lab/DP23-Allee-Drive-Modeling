@@ -29,12 +29,25 @@
 
 # The maximum running time of the job in days-hours:mins:sec
 #SBATCH --time=1-0:0:00
+#SBATCH --array=1-100
 
 # check that the script is launched with sbatch
 if [ "x$SLURM_JOB_ID" == "x" ]; then
    echo "You need to submit your job to the queuing system with sbatch"
    exit 1
 fi
+
+outputFile="out.csv"
+
+
+# Check if the file already exists
+if [ -f "$outputFile" ]; then
+    echo "Error: File $outputFile already exists."
+    exit 1
+fi
+
+# Write to the file
+echo "Result,MutationFrequency,MutationCount,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 
 # Run the job from this directory:
 cd /home/lnowellnicol/punim2001/DP23-Allee-Drive-Modeling
@@ -43,9 +56,7 @@ module load bash/4.3
 module load slim/4.0.1
 
 # The job command(s):
-for i in `seq 1 1 100`; do
-   bash ./LoadedIsolatedFoundingPopulation.sh
-done
+bash ./LoadedIsolatedFoundingPopulation.sh ${SLURM_ARRAY_TASK_ID}
 
 ##DO NOT ADD/EDIT BEYOND THIS LINE##
 ##Job monitor command to list the resource usage

@@ -10,17 +10,5 @@ declare -A paramRanges=(
   ["xlinked"]=$(seq 0 1 1)
 )
 
-outputFile="out.csv"
 
-
-# Check if the file already exists
-if [ -f "$outputFile" ]; then
-    echo "Error: File $outputFile already exists."
-    exit 1
-fi
-
-# Write to the file
-echo "Result,MutationFrequency,MutationCount,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
-
-
-runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d seed=$1 -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
