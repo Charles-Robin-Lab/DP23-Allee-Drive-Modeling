@@ -43,8 +43,8 @@ module load bash/4.3
 module load slim/4.0.1
 
 # The job command(s):
-for i in `seq 1 100`; do
-bash ./LoadedIsolatedFoundingPopulation.sh
+for i in `seq 1 1 100`; do
+   bash ./LoadedIsolatedFoundingPopulation.sh
 done
 
 ##DO NOT ADD/EDIT BEYOND THIS LINE##
