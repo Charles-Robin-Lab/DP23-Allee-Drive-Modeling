@@ -7,6 +7,9 @@ initialize() {
 	defineConstant("homozygousSterilityChance",1.0);
 	defineConstant("genomeSize",99999);
 	// defineConstant("migrantsSize",20);
+	// defineConstant("sterility",1);
+	// defineConstant("xlinked",1);
+	// defineConstant("outputFilePath","./out1");
 	
 	initializeMutationRate(0.0);
 	initializeMutationType("m0", 0.5, "f", 0.0);
@@ -42,7 +45,7 @@ early() {
 	}
 }
 
-
+// add mutations
 10 late() {
 	muts = community.allMutationTypes;
 	allXs = sim.subpopulations.individuals.genomes[!(sim.subpopulations.individuals.genomes.isNullGenome)];
@@ -54,11 +57,16 @@ early() {
 		).addNewDrawnMutation(muts[i], asInteger(genomeSize/mutsCount*i));
 	}
 }
+
+// create founder population
 11 late() {
 	migrants = sample(sim.subpopulations[0].individuals, migrantsSize);
 	sim.subpopulations[1].takeMigrants(migrants);
 	// kill since no longer needed
 	sim.killIndividuals(sim.subpopulations[0].individuals);
+	
+	//stats
+	defineConstant("foundingMalesCount",sum(migrants.sex=="M"));
 }
 
 
@@ -66,12 +74,15 @@ early() {
 	//end condition 1: population crash
 	if (size(sim.subpopulations[1].individuals) == 0) {
 		cat("EXTINCT\n");
+		writeOutputData("EXTINCT");
 		sim.simulationFinished();
 	}
 }
 250 late() {
 	//end condition 2: survival
-	cat(ifelse(size(sim.subpopulations[1].individuals) >= 150,"SURVIVED\n","UNDECIDED\n"));
+	result = ifelse(size(sim.subpopulations[1].individuals) >= 150,"SURVIVED","UNDECIDED");
+	cat(result+"\n");
+	writeOutputData(result);
 	sim.simulationFinished();
 
 }
@@ -103,4 +114,15 @@ function (integer)copiesOfMutations(o<Individual>$ ind, o<MutationType> mutTypes
 		out = c(out, asInteger(hasMutOnChromosome1) + asInteger(hasMutOnChromosome2));
 	}
 	return out;
+}
+
+function (void)writeOutputData(string result) {
+	writeFile(outputFilePath,  
+		asString(result)+","+
+		asString(mutsFrequency)+","+
+		asString(mutsCount)+","+
+		asString(migrantsSize)+","+
+		asString(sterility)+","+
+		asString(xlinked)
+	, append = T);
 }
