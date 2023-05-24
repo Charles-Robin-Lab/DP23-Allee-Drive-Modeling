@@ -39,15 +39,10 @@ fi
 
 outputFile="out.csv"
 
-
 # Check if the file already exists
-if [ -f "$outputFile" ]; then
-    echo "Error: File $outputFile already exists."
-    exit 1
+if [ ! -f "$outputFile" ]; then
+   echo "Result,MutationFrequency,MutationCount,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 fi
-
-# Write to the file
-echo "Result,MutationFrequency,MutationCount,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 
 # Run the job from this directory:
 cd /home/lnowellnicol/punim2001/DP23-Allee-Drive-Modeling
