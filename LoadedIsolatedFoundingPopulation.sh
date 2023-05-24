@@ -10,5 +10,6 @@ declare -A paramRanges=(
   ["xlinked"]=$(seq 0 1 1)
 )
 
+outputFile="out.csv"
 
 runOverRanges "slim -d seed=$1 -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
