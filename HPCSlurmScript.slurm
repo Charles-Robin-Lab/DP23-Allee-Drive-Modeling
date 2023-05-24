@@ -27,8 +27,13 @@
 # ends successfully
 #SBATCH --mail-type=END
 
+# output files
+#SBATCH -o logs/slurm.%N.%j.out # STDOUT 
+#SBATCH -e logs/slurm.%N.%j.err # STDERR
+
 # The maximum running time of the job in days-hours:mins:sec
 #SBATCH --time=1-0:0:00
+# Parralelise the computation
 #SBATCH --array=1-100
 
 # check that the script is launched with sbatch
