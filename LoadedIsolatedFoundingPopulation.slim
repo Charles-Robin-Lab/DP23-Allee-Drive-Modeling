@@ -117,7 +117,8 @@ function (integer)copiesOfMutations(o<Individual>$ ind, o<MutationType> mutTypes
 }
 
 function (void)writeOutputData(string result) {
-	writeFile(outputFilePath,  
+	writeFile(outputFilePath, 
+		asString(getSeed())+","+ 
 		asString(result)+","+
 		asString(mutsFrequency)+","+
 		asString(mutsCount)+","+
