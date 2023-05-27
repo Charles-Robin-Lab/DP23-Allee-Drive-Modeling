@@ -2,6 +2,8 @@
 # Created by the University of Melbourne job script generator for SLURM
 # Thu May 18 2023 02:25:29 GMT+1000 (Australian Eastern Standard Time)
 
+# # # Settings for Sbatch
+
 # Partition for the job:
 #SBATCH --partition=physical
 
@@ -9,7 +11,7 @@
 #SBATCH --nodes=1
 
 # The name of the job:
-#SBATCH --job-name="TestJob1"
+#SBATCH --job-name="LoadedIsolatedFoundingPopulation"
 
 # The project ID which this job should run under:
 #SBATCH --account="punim2001"
@@ -27,7 +29,7 @@
 # ends successfully
 #SBATCH --mail-type=END
 
-# output files
+# log output files
 #SBATCH -o logs/slurm.%N.%j.out # STDOUT 
 #SBATCH -e logs/slurm.%N.%j.err # STDERR
 
@@ -36,28 +38,52 @@
 # Parralelise the computation
 #SBATCH --array=1-100
 
+# # # File and version checks 
+
+# Run the job from this directory:
+cd /home/lnowellnicol/punim2001/DP23-Allee-Drive-Modeling
+
 # check that the script is launched with sbatch
 if [ "x$SLURM_JOB_ID" == "x" ]; then
    echo "You need to submit your job to the queuing system with sbatch"
    exit 1
 fi
 
-outputFile="out.csv"
+# Check if the bash version is lower than 4.3.0 since we use associative arrays
+if [[ "${BASH_VERSION}" < "4.3.0" ]]; then
+    echo "Error: Bash version 4.3.0 or higher is required. Please run 'module load bash/4.3'"
+    exit 1
+fi
 
-# Check if the file already exists
+# Write csv header if outputfile doesnt exist
+outputFile="out.csv"
 if [ ! -f "$outputFile" ]; then
    echo "Result,MutationFrequency,MutationCount,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 fi
 
-# Run the job from this directory:
-cd /home/lnowellnicol/punim2001/DP23-Allee-Drive-Modeling
+# check sources
+bcpriSourcePath="../Bash-Command-Parameter-Ranges-Iterator/BashCommandParameterRangesIterator.sh"
+if [ ! -f "$bcpriSourcePath" ]; then
 
-module load bash/4.3
+fi
+
+# # # run job code
+
+# Source files
 module load slim/4.0.1
+source $bcpriSourcePath
 
-# The job command(s):
-bash ./LoadedIsolatedFoundingPopulation.sh ${SLURM_ARRAY_TASK_ID}
+declare -A paramRanges=(
+  ["migrantsSize"]=$(seq 2 1 30)
+  ["mutsFrequency"]=$(seq 0.01 0.01 0.20)
+  ["mutsCount"]=$(seq 3 1 30)
+  ["sterility"]=$(seq 0 1 1)
+  ["xlinked"]=$(seq 0 1 1)
+)
+
+runOverRanges "slim -seed ${SLURM_ARRAY_TASK_ID} -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 
 ##DO NOT ADD/EDIT BEYOND THIS LINE##
 ##Job monitor command to list the resource usage
 my-job-stats -a -n -s
+
