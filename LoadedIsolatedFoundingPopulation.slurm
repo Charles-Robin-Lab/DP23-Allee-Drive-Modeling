@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/local/easybuild-2019/easybuild/software/compiler/gcc/11.2.0/bash/4.3/bin/bash
 # Created by the University of Melbourne job script generator for SLURM
 # Thu May 18 2023 02:25:29 GMT+1000 (Australian Eastern Standard Time)
 
@@ -51,7 +51,7 @@ fi
 
 # Check if the bash version is lower than 4.3.0 since we use associative arrays
 if [[ "${BASH_VERSION}" < "4.3.0" ]]; then
-    echo "Error: Bash version 4.3.0 or higher is required. Please run 'module load bash/4.3'"
+    echo "Error: Bash version 4.3.0 or higher is required. Please edit the first line of the script to point to it"
     exit 1
 fi
 
@@ -64,7 +64,8 @@ fi
 # check sources
 bcpriSourcePath="../Bash-Command-Parameter-Ranges-Iterator/BashCommandParameterRangesIterator.sh"
 if [ ! -f "$bcpriSourcePath" ]; then
-
+    echo "Error: Bash-Command-Parameter-Ranges-Iterator not found please download from https://github.com/4321louis/Bash-Command-Parameter-Ranges-Iterator and edit this script to point to it"
+    exit 1
 fi
 
 # # # run job code
