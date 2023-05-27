@@ -7,4 +7,4 @@
 
 
 # Run Jobs
- ```sbatch HPCSlurmScript.slurm```
+ ```sbatch LoadedIsolatedFoundingPopulation.slurm```
