@@ -16,8 +16,8 @@ initialize() {
 	initializeGenomicElementType("g0", m0, 1.0);
 	initializeGenomicElement(g0, 0, genomeSize);
 	initializeRecombinationRate(1e-8);
+	initializeSex(xlinked ? "X" else "A");
 	
-	initializeSex("X");
 	for (i in 1:mutsCount) {
 		mut = initializeMutationType("m"+asString(i) , 1.0, "f", mutsHetFitness);
 		mut.color = "green"; 
@@ -28,32 +28,24 @@ initialize() {
 
 1 early() {
 	sim.addSubpop(0, 500);
-	sim.subpopulations[0].setValue("carryingCapacity",1000);
 	sim.addSubpop(1, 0);
-	sim.subpopulations[1].setValue("carryingCapacity",500);
 }
 
 early() {
 	//kill old individuals
 	inds = sim.subpopulations.individuals; 
-	sim.killIndividuals(inds[inds.age > 2]);
-
-	//carrying capacity for populations because limited resources
-	for (i in 0:1){
-		p = sim.subpopulations[i];
-		p.fitnessScaling = p.getValue("carryingCapacity") / p.individualCount;
-	}
+	sim.killIndividuals(inds[inds.age >= 1]);
 }
 
 // add mutations
 10 late() {
 	muts = community.allMutationTypes;
-	allXs = sim.subpopulations.individuals.genomes[!(sim.subpopulations.individuals.genomes.isNullGenome)];
+	possibleCarrierChromosomes = sim.subpopulations.individuals.genomes[!(sim.subpopulations.individuals.genomes.isNullGenome)];
 	for (i in 0:(mutsCount-1)) {
 		
 		sample(
-			allXs, 
-			asInteger(mutsFrequency*size(allXs))
+			possibleCarrierChromosomes, 
+			asInteger(mutsFrequency*size(possibleCarrierChromosomes))
 		).addNewDrawnMutation(muts[i], asInteger(genomeSize/mutsCount*i));
 	}
 }
@@ -77,6 +69,13 @@ early() {
 		writeOutputData("EXTINCT");
 		sim.simulationFinished();
 	}
+	//end condition 2: survival
+	if (size(sim.subpopulations[1].individuals) >= 520) {
+		cat("SURVIVED\n");
+		writeOutputData("SURVIVED");
+		sim.simulationFinished();
+	}
+	
 }
 250 late() {
 	//end condition 2: survival
@@ -88,14 +87,30 @@ early() {
 }
 
 reproduction(NULL, "F") {
-	copies = copiesOfMutations(individual, community.allMutationTypes);
-	individual.color =  rgb2color(c(sum(copies)/size(copies), 1.0 - sum(copies)/size(copies),0.1));
-	if (size(copies[copies>=2]) != 0)
-		return;
-	mate = subpop.sampleIndividuals(1, sex="M");	
-	if (size(mate)==1) {
-		subpop.addCrossed(individual, mate);
-	}	
+	//steriles dont reproduce
+	if (sterility)
+		if (any(2<=copiesOfMutations(individual, community.allMutationTypes)))
+			return;
+	
+	//produce offspring
+	initialRate = 0.25;
+	carryingCapacity = 500;
+	growthRate=max(initialRate*(1-1/carryingCapacity*subpop.individualCount),-1.9999999);
+	for (i in seqLen(rpois(1, growthRate+2))) {
+		mate = subpop.sampleIndividuals(1, sex="M");	
+		if (size(mate)) {
+			subpop.addCrossed(individual, mate);
+		}
+	}
+}
+modifyChild() {
+	//lethals die
+	if (sterility)
+		return T;
+	if (child.sex!="F")
+		return T;
+	return !any(2<=copiesOfMutations(child, community.allMutationTypes));
+		 
 }
 
 function (integer)copiesOfMutations(o<Individual>$ ind, o<MutationType> mutTypes) {	
