@@ -1,15 +1,16 @@
 initialize() {
-	
 	initializeSLiMModelType("nonWF");
-	// defineConstant("mutsFrequency",0.13);
-	// defineConstant("mutsCount",14);
-	defineConstant("mutsHetFitness",0.000);
-	defineConstant("homozygousSterilityChance",1.0);
-	defineConstant("genomeSize",99999);
-	// defineConstant("migrantsSize",20);
-	// defineConstant("sterility",1);
-	// defineConstant("xlinked",1);
-	// defineConstant("outputFilePath","./out1");
+	defineConstantIfNotExist("mutsFrequency",0.13);
+	defineConstantIfNotExist("mutsCount",10);
+	defineConstantIfNotExist("mutsHetFitness",0.000);
+	defineConstantIfNotExist("homozygousSterilityChance",1.0);
+	defineConstantIfNotExist("genomeSize",99999);
+	defineConstantIfNotExist("migrantsSize",20);
+	defineConstantIfNotExist("sterility",T);
+	defineConstantIfNotExist("xlinked",T);
+	defineConstantIfNotExist("maximalGrowthRate",0.5);
+	defineConstantIfNotExist("carryingCapacity",800);
+	defineConstantIfNotExist("outputFilePath","./out1");
 	
 	initializeMutationRate(0.0);
 	initializeMutationType("m0", 0.5, "f", 0.0);
@@ -70,7 +71,7 @@ early() {
 		sim.simulationFinished();
 	}
 	//end condition 2: survival
-	if (size(sim.subpopulations[1].individuals) >= 520) {
+	if (size(sim.subpopulations[1].individuals) >= 1.05*carryingCapacity) {
 		cat("SURVIVED\n");
 		writeOutputData("SURVIVED");
 		sim.simulationFinished();
@@ -79,7 +80,7 @@ early() {
 }
 250 late() {
 	//end condition 2: survival
-	result = ifelse(size(sim.subpopulations[1].individuals) >= 150,"SURVIVED","UNDECIDED");
+	result = ifelse(size(sim.subpopulations[1].individuals) >= 0.6*carryingCapacity,"SURVIVED","UNDECIDED");
 	cat(result+"\n");
 	writeOutputData(result);
 	sim.simulationFinished();
@@ -93,9 +94,7 @@ reproduction(NULL, "F") {
 			return;
 	
 	//produce offspring
-	initialRate = 0.25;
-	carryingCapacity = 500;
-	growthRate=max(initialRate*(1-1/carryingCapacity*subpop.individualCount),-1.9999999);
+	growthRate=max(maximalGrowthRate*(1-subpop.individualCount/carryingCapacity),-1.9999999);
 	for (i in seqLen(rpois(1, growthRate+2))) {
 		mate = subpop.sampleIndividuals(1, sex="M");	
 		if (size(mate)) {
@@ -142,4 +141,10 @@ function (void)writeOutputData(string result) {
 		asString(sterility)+","+
 		asString(xlinked)
 	, append = T);
+}
+
+function (void)defineConstantIfNotExist(string$ symbol, * value) {
+	if (!exists(symbol)) {
+		defineConstant(symbol,value);	
+	}
 }
