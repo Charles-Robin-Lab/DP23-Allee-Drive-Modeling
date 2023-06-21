@@ -79,11 +79,11 @@ early() {
 	
 }
 250 late() {
-	//end condition 2: survival
-	result = ifelse(size(sim.subpopulations[1].individuals) >= 0.6*carryingCapacity,"SURVIVED","UNDECIDED");
-	cat(result+"\n");
-	writeOutputData(result);
-	sim.simulationFinished();
+	// //end condition 2: long term survival
+	// result = ifelse(size(sim.subpopulations[1].individuals) >= 0.6*carryingCapacity,"SURVIVED","UNDECIDED");
+	// cat(result+"\n");
+	// writeOutputData(result);
+	// sim.simulationFinished();
 
 }
 
