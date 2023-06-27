@@ -9,7 +9,7 @@ initialize() {
 	defineConstantIfNotExist("sterility",T);
 	defineConstantIfNotExist("xlinked",T);
 	defineConstantIfNotExist("maximalGrowthRate",0.5);
-	defineConstantIfNotExist("carryingCapacity",500);
+	defineConstantIfNotExist("carryingCapacity",1000);
 	defineConstantIfNotExist("outputFilePath","./out1");
 	
 	initializeMutationRate(0.0);
@@ -28,7 +28,7 @@ initialize() {
 }
 
 1 early() {
-	sim.addSubpop(0, 500);
+	sim.addSubpop(0, carryingCapacity);
 	sim.addSubpop(1, 0);
 }
 
@@ -38,7 +38,7 @@ early() {
 	sim.killIndividuals(inds[inds.age >= 1]);
 }
 
-10 late() {
+2 late() {
 	// add mutations
 	muts = community.allMutationTypes;
 	possibleCarrierChromosomes = sim.subpopulations.individuals.genomes[!(sim.subpopulations.individuals.genomes.isNullGenome)];
@@ -50,8 +50,10 @@ early() {
 		).addNewDrawnMutation(muts[i], asInteger(genomeSize/mutsCount*i));
 	}
 	// create founder population
-	migrants = sample(sim.subpopulations[0].individuals, migrantsSize);
-	sim.subpopulations[1].takeMigrants(migrants);
+	if (size(sim.subpopulations[0].individuals) > migrantsSize) {
+		migrants = sample(sim.subpopulations[0].individuals, migrantsSize);
+		sim.subpopulations[1].takeMigrants(migrants);
+	}
 	// kill core since no longer needed
 	sim.killIndividuals(sim.subpopulations[0].individuals);
 	
@@ -60,7 +62,7 @@ early() {
 }
 
 
-30:10000 late() {
+2:10000 late() {
 	//end condition 1: population crash
 	if (size(sim.subpopulations[1].individuals) == 0) {
 		cat("EXTINCT\n");
