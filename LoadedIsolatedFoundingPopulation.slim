@@ -9,7 +9,7 @@ initialize() {
 	defineConstantIfNotExist("sterility",T);
 	defineConstantIfNotExist("xlinked",T);
 	defineConstantIfNotExist("maximalGrowthRate",0.5);
-	defineConstantIfNotExist("carryingCapacity",1000);
+	defineConstantIfNotExist("carryingCapacity",500);
 	defineConstantIfNotExist("outputFilePath","./out1");
 	
 	initializeMutationRate(0.0);
@@ -38,8 +38,8 @@ early() {
 	sim.killIndividuals(inds[inds.age >= 1]);
 }
 
-// add mutations
 10 late() {
+	// add mutations
 	muts = community.allMutationTypes;
 	possibleCarrierChromosomes = sim.subpopulations.individuals.genomes[!(sim.subpopulations.individuals.genomes.isNullGenome)];
 	for (i in 0:(mutsCount-1)) {
@@ -49,13 +49,10 @@ early() {
 			asInteger(mutsFrequency*size(possibleCarrierChromosomes))
 		).addNewDrawnMutation(muts[i], asInteger(genomeSize/mutsCount*i));
 	}
-}
-
-// create founder population
-11 late() {
+	// create founder population
 	migrants = sample(sim.subpopulations[0].individuals, migrantsSize);
 	sim.subpopulations[1].takeMigrants(migrants);
-	// kill since no longer needed
+	// kill core since no longer needed
 	sim.killIndividuals(sim.subpopulations[0].individuals);
 	
 	//stats
@@ -71,7 +68,7 @@ early() {
 		sim.simulationFinished();
 	}
 	//end condition 2: survival
-	if (size(sim.subpopulations[1].individuals) >= 1.05*carryingCapacity) {
+	if (size(sim.subpopulations[1].individuals) >= carryingCapacity) {
 		cat("SURVIVED\n");
 		writeOutputData("SURVIVED");
 		sim.simulationFinished();
@@ -135,6 +132,7 @@ function (void)writeOutputData(string result) {
 	writeFile(outputFilePath, 
 		asString(getSeed())+","+ 
 		asString(result)+","+
+		asString(sim.cycle)+","+
 		asString(mutsFrequency)+","+
 		asString(mutsCount)+","+
 		asString(maximalGrowthRate)+","+
