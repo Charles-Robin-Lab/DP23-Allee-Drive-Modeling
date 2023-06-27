@@ -58,7 +58,7 @@ fi
 # Write csv header if outputfile doesnt exist
 outputFile="out.csv"
 if [ ! -f "$outputFile" ]; then
-   echo "Result,MutationFrequency,MutationCount,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
+   echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 fi
 
 # check sources
