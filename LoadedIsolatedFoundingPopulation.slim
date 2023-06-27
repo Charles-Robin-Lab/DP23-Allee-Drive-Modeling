@@ -9,7 +9,7 @@ initialize() {
 	defineConstantIfNotExist("sterility",T);
 	defineConstantIfNotExist("xlinked",T);
 	defineConstantIfNotExist("maximalGrowthRate",0.5);
-	defineConstantIfNotExist("carryingCapacity",800);
+	defineConstantIfNotExist("carryingCapacity",1000);
 	defineConstantIfNotExist("outputFilePath","./out1");
 	
 	initializeMutationRate(0.0);
@@ -102,6 +102,7 @@ reproduction(NULL, "F") {
 		}
 	}
 }
+
 modifyChild() {
 	//lethals die
 	if (sterility)
