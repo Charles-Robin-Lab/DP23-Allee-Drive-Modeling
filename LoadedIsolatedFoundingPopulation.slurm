@@ -84,7 +84,7 @@ source $bcpriSourcePath
 # )
 # intial test
 declare -A paramRanges=(
-  ["maximalGrowthRate"]=$(seq 0.1 0.5 1.6; seq 2 2 10)
+  ["maximalGrowthRate"]=$(seq 0.1 0.5 1.6; seq 2 4 20)
   ["migrantsSize"]=$(seq 2 10 102)
   ["mutsFrequency"]=$(seq 0.01 0.05 0.21)
   ["mutsCount"]=$(seq 1 10 101)
