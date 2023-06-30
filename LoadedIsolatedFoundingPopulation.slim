@@ -38,7 +38,7 @@ early() {
 	sim.killIndividuals(inds[inds.age >= 1]);
 }
 
-2 late() {
+1 late() {
 	// add mutations
 	muts = community.allMutationTypes;
 	possibleCarrierChromosomes = sim.subpopulations.individuals.genomes[!(sim.subpopulations.individuals.genomes.isNullGenome)];
@@ -62,7 +62,7 @@ early() {
 }
 
 
-2:10000 late() {
+1:10000 late() {
 	//end condition 1: population crash
 	if (size(sim.subpopulations[1].individuals) == 0) {
 		cat("EXTINCT\n");
