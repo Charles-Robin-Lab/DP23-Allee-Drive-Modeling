@@ -1,29 +1,112 @@
-data <- read.csv("./out.csv")
-# summary(lm(Result ~ MutationFrequency*MutationCount,data=data))
-
-
 
 library(dplyr)
 
-# Assuming your data frame is named 'data'
-# Create a new column 'count' that counts the occurrences of each combination of a, b, and c
-groupedData <- data %>%
-  dplyr::group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>%
-  dplyr::mutate(count = n())
-
-# # Create a new column 'T_percentage' that calculates the percentage of T results for each combination of a, b, and c
-groupedData <- groupedData %>%
-  dplyr::group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>%
-  dplyr::mutate(T_percentage = sum(Result == "SURVIVED") / count * 100)
+groupedData <- read.csv("./out.csv") %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
+  mutate(count = n()) %>%
+  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count) %>% 
+  summarise()
 
 
-data1 <- filter(groupedData, MutationFrequency==0.16, Individuals == 32, GrowthRate == 2, Sterile==1, Xlinked==0)
-plot(data1$MutationCount,data1$T_percentage)
 
-# sapply(data1$MutationFrequency,head,100)
+XlessgroupedData <- read.csv("./out.csv") %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
+  mutate(count = n()) %>%
+  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, survivalRate,count) %>% 
+  summarise()
+# 
+XlessgroupedData$XDiff <- groupedData[groupedData$Xlinked==1,]$survivalRate-groupedData[groupedData$Xlinked==0,]$survivalRate
+hist(XlessgroupedData$XDiff,breaks = c(-0.3,-0.2,-0.1,-0.05,-0.02,-0.01,0.01,0.02,0.05,0.1,0.2,0.3))
 
-# View the modified data frame
-print(data1)
+XlessgroupedData <- XlessgroupedData %>%
+  group_by(MutationFrequency, MutationCount, Individuals) %>% 
+  mutate(count = n()) %>%
+  mutate(groupedSurvivalRate = sum(survivalRate)/count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, groupedSurvivalRate) %>% 
+  summarise()
+
+
+
+# Extra stats
+groupedData$logisticSurvivalRate <- log(groupedData$survivalRate/(1-groupedData$survivalRate))
+groupedData$sQIndividuals <- groupedData$Individuals^2
+groupedData$sQMutationFrequency <- groupedData$MutationFrequency^2
+groupedData$eIndividuals <- exp(groupedData$Individuals)
+
+# Compare X-linked and not
+dataSlice2d.mutationCount <- filter(groupedData, MutationFrequency==0.16, Individuals == 32, GrowthRate == 2, Sterile==1)
+plot(survivalRate~MutationCount,data=dataSlice2d.mutationCount)
+
+
+
+
+library(ggplot2)
+dataSlice3d.countfreq <- filter(groupedData, Individuals == 32, GrowthRate == 2, Sterile==1, Xlinked==1)
+
+dataSlice3d.countInd <- filter(groupedData, MutationFrequency == 0.11, GrowthRate == 2, Sterile==1, Xlinked==1)
+
+breaks <- c(22,24,28,36,52,84,120)
+colors <- c("#fcfbc7", "#efb87c", "#e56a57" , "#be3371", "#721f7d", "#300c61", "#000000")
+
+# Create a named vector of colors for the scale
+color_scale <- setNames(colors, formatC(breaks, format = "g"))
+
+
+ggplot(dataSlice3d.countfreq,aes(x=MutationFrequency,y=MutationCount),)+
+  geom_tile(aes(fill=survivalRate))+
+  scale_x_continuous(breaks = seq(0.01, 0.31, 0.05),expand = c(0,0) )+
+  scale_y_continuous(breaks = seq(2, 102, 10) ,expand = c(0,0))+
+  scale_fill_gradientn(name = "", colours = color_scale, breaks = breaks ,guide="none") +
+  theme_classic()+
+  labs(fill = "Generations")+
+  theme(legend.title.align=0.5)
+  
+ggplot(dataSlice3d.countInd,aes(x=Individuals,y=MutationCount),)+
+  geom_tile(aes(fill=survivalRate))+
+  scale_x_continuous(breaks = seq(2, 102, 10),expand = c(0,0) )+
+  scale_y_continuous(breaks = seq(2, 102, 10) ,expand = c(0,0))+
+  scale_fill_gradientn(name = "", colours = color_scale, breaks = breaks ,guide="none") +
+  theme_classic()+
+  labs(fill = "Generations")+
+  theme(legend.title.align=0.5)
+
+
+#Model decission
+# library(pROC)
+# roc.curve <- roc()
+
+options(width=2000)
+model.all <- glm(survivalRate~MutationCount*MutationFrequency*Individuals*GrowthRate*Sterile,family=binomial(),data=groupedData)
+model.allaic <- step(model.all,direction='both') 
+
+model.sig <- glm(survivalRate ~ 
+  GrowthRate + 
+  MutationCount:MutationFrequency + 
+  MutationCount:GrowthRate +
+  MutationFrequency:GrowthRate + 
+  Individuals:GrowthRate + 
+  GrowthRate:Sterile + 
+  MutationCount:MutationFrequency:Individuals + 
+  MutationCount:Individuals:GrowthRate  + 
+  MutationFrequency:Individuals:GrowthRate  + 
+  Individuals:GrowthRate:Sterile + 
+  MutationCount:MutationFrequency:Individuals:GrowthRate + 
+  MutationCount:MutationFrequency:Individuals:Sterile + 
+  MutationCount:Individuals:GrowthRate:Sterile  + 
+  MutationFrequency:Individuals:GrowthRate:Sterile )
+
+model.all.added <-glm(survivalRate~MutationCount*(I(MutationFrequency^2)+MutationFrequency)*(I(Individuals^2)+Individuals)*GrowthRate*Sterile,family=binomial(),data=groupedData)
+
+
+dataLine <- filter(groupedData,survivalRate <= 0.90,survivalRate >= 0.10)
+
+# time analysis
+x = (0:(1500/25))*25
+y= data.frame(w=0)
+for (a in x) {
+   y[nrow(y)+1,] = nrow(data[data$Time>a,])/nrow(data)
+}
+plot(x,y[2:62])
 # print(filter(data, Time>5000, Result == "EXTINCT"))
-
-

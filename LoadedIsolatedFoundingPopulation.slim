@@ -44,8 +44,6 @@ early() {
 	muts = community.allMutationTypes;
 	possibleCarrierChromosomes = sim.subpopulations.individuals.genomes[!(sim.subpopulations.individuals.genomes.isNullGenome)];
 	for (i in 1:mutsCount) {
-		print(size(possibleCarrierChromosomes));
-		print(asInteger(mutsFrequency*size(possibleCarrierChromosomes)));
 		sample(
 			possibleCarrierChromosomes, 
 			asInteger(mutsFrequency*size(possibleCarrierChromosomes))
