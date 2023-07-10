@@ -56,7 +56,7 @@ if [[ "${BASH_VERSION}" < "4.3.0" ]]; then
 fi
 
 # Write csv header if outputfile doesnt exist
-outputFile="out.csv"
+outputFile="out_$SLURM_JOB_ID.csv"
 if [ ! -f "$outputFile" ]; then
    echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 fi
@@ -86,7 +86,7 @@ source $bcpriSourcePath
 declare -A paramRanges=(
   ["maximalGrowthRate"]=$(seq 0.1 0.5 1.6; seq 2 4 22)
   ["migrantsSize"]=$(seq 2 10 102)
-  ["mutsFrequency"]=$(seq 0.01 0.05 0.21)
+  ["mutsFrequency"]=$(seq 0.01 0.05 0.31)
   ["mutsCount"]=$(seq 1 10 101)
   ["sterility"]=$(seq 0 1 1)
   ["xlinked"]=$(seq 0 1 1)

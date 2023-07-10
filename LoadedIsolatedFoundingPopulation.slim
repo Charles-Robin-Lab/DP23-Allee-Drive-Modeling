@@ -1,4 +1,5 @@
 initialize() {
+	setSeed(rdunif(1, 0, asInteger(2^62) - 1));
 	initializeSLiMModelType("nonWF");
 	defineConstantIfNotExist("mutsFrequency",0.13);
 	defineConstantIfNotExist("mutsCount",10);
