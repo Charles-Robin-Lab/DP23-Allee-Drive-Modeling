@@ -56,7 +56,7 @@ if [[ "${BASH_VERSION}" < "4.3.0" ]]; then
 fi
 
 # Write csv header if outputfile doesnt exist
-outputFile="out_$((SLURM_JOB_ID - SLURM_ARRAY_TASK_ID)).csv"
+outputFile="out_$SLURM_ARRAY_JOB_ID.csv"
 if [ ! -f "$outputFile" ]; then
    echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 fi
