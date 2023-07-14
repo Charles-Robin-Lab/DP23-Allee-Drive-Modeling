@@ -1,5 +1,5 @@
 # DP23 Allee Drive Modeling
- Modelling Genetic Allele Effects on expanding populations in SLiM. 
+ Modelling Genetic Allee Effects on expanding populations in SLiM. 
  1. Examining the survival rate on isolated founding population
  2. Examine the affect on wave velocity
  3. Examine the load generated from various release strategies.
