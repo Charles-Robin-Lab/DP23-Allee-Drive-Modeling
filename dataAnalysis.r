@@ -67,10 +67,19 @@ groupedData$eIndividuals <- exp(groupedData$Individuals)
 groupedData$individualChance <- 0.5*(1-(1-groupedData$MutationFrequency^2)^groupedData$MutationCount)
 
 # Compare X-linked and not
-dataSlice2d.mutationCount <- filter(groupedData, MutationFrequency==0.16, Individuals == 12, GrowthRate == 22, Sterile==1)
-dataSlice2d.mutationCount <- filter(groupedData, MutationFrequency==0.21, Individuals == 102, GrowthRate == 14, Xlinked==1)
+# dataSlice2d.mutationCount <- filter(groupedData, MutationFrequency==0.16, Individuals == 12, GrowthRate == 22, Sterile==1)
+# dataSlice2d.mutationCount <- filter(groupedData, MutationFrequency==0.21, Individuals == 102, GrowthRate == 14, Xlinked==1)
+# dataSlice2d.mutationCount <- filter(XlessgroupedData, MutationFrequency==0.11, Individuals == 42, GrowthRate == 2, Sterile==1)
+dataSlice2d.MutationFrequency <- filter(XlessgroupedData, MutationCount==61, Individuals == 22, GrowthRate == 2, Sterile==1)
+dataSlice2d.MutationCount <- filter(XlessgroupedData, MutationFrequency==0.11, Individuals == 22, GrowthRate == 2, Sterile==1)
+dataSlice2d.Lethal <- filter(XlessgroupedData, MutationFrequency==0.11, Individuals == 22, GrowthRate == 2, Sterile==0)
+dataSlice2d.Individuals <- filter(XlessgroupedData, MutationFrequency==0.11, MutationCount==61, GrowthRate == 2, Sterile==1)
+dataSlice2d.GrowthRate <- filter(XlessgroupedData, MutationFrequency==0.11, MutationCount==61, Individuals == 22, Sterile==1)
 
-plot(survivalRate~MutationCount,data=dataSlice2d.mutationCount)
+plot(survivalRate~MutationFrequency,data=dataSlice2d.MutationFrequency,ylim=c(0,1))
+plot(survivalRate~MutationCount,data=dataSlice2d.MutationCount,ylim=c(0,1))
+plot(survivalRate~Individuals,data=dataSlice2d.Individuals,ylim=c(0,1))
+plot(survivalRate~GrowthRate,data=dataSlice2d.GrowthRate,ylim=c(0,1))
 
 
 
