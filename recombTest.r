@@ -1,23 +1,23 @@
 data.5 <- read.csv("./5recombTest.csv") %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count) %>% 
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, survivalRate,count) %>% 
   summarise()
 
 
 data.8 <- read.csv("./8recombTest.csv") %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count) %>% 
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, survivalRate,count) %>% 
   summarise()
 
 data.11 <- read.csv("./11recombTest.csv") %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count) %>% 
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, survivalRate,count) %>% 
   summarise()
 
 

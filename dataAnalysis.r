@@ -16,9 +16,39 @@ XlessgroupedData <- read.csv("./out.csv") %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, survivalRate,count) %>% 
   summarise()
-# 
-XlessgroupedData$XDiff <- groupedData[groupedData$Xlinked==1,]$survivalRate-groupedData[groupedData$Xlinked==0,]$survivalRate
-hist(XlessgroupedData$XDiff,breaks = c(-0.3,-0.2,-0.1,-0.05,-0.02,-0.01,0.01,0.02,0.05,0.1,0.2,0.3))
+
+  
+
+xtestData <- read.csv("./out.csv") %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
+  mutate(count = n()) %>%
+  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
+  filter(survivalRate<0.975 && survivalRate>0.025) %>%
+  ungroup()  %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
+  mutate(count = n()) %>%
+  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count) %>% 
+  summarise()
+
+xlinkedDiffs <- xtestData[xtestData$Xlinked==1,]$survivalRate-xtestData[xtestData$Xlinked==0,]$survivalRate
+hist(xlinkedDiffs,breaks = c(-0.3,-0.2,-0.15,-0.1,-0.05,-0.02,-0.01,0.01,0.02,0.05,0.1,0.15,0.2,0.3))
+
+steriletestData <- read.csv("./out.csv") %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Xlinked) %>% 
+  mutate(count = n()) %>%
+  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
+  filter(survivalRate<0.975 && survivalRate>0.025) %>%
+  ungroup()  %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
+  mutate(count = n()) %>%
+  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count) %>% 
+  summarise()
+sterileDiffs <- steriletestData[steriletestData$Sterile==1,]$survivalRate-steriletestData[steriletestData$Sterile==0,]$survivalRate
+hist(sterileDiffs,breaks = c(-1.0,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,-0.0375,0.0375,0.1,0.2,0.3))
+boxplot(sterileDiffs,xlinkedDiffs)
+
 
 XlessgroupedData <- XlessgroupedData %>%
   group_by(MutationFrequency, MutationCount, Individuals) %>% 
@@ -34,9 +64,12 @@ groupedData$logisticSurvivalRate <- log(groupedData$survivalRate/(1-groupedData$
 groupedData$sQIndividuals <- groupedData$Individuals^2
 groupedData$sQMutationFrequency <- groupedData$MutationFrequency^2
 groupedData$eIndividuals <- exp(groupedData$Individuals)
+groupedData$individualChance <- 0.5*(1-(1-groupedData$MutationFrequency^2)^groupedData$MutationCount)
 
 # Compare X-linked and not
-dataSlice2d.mutationCount <- filter(groupedData, MutationFrequency==0.16, Individuals == 32, GrowthRate == 2, Sterile==1)
+dataSlice2d.mutationCount <- filter(groupedData, MutationFrequency==0.16, Individuals == 12, GrowthRate == 22, Sterile==1)
+dataSlice2d.mutationCount <- filter(groupedData, MutationFrequency==0.21, Individuals == 102, GrowthRate == 14, Xlinked==1)
+
 plot(survivalRate~MutationCount,data=dataSlice2d.mutationCount)
 
 
@@ -78,7 +111,9 @@ ggplot(dataSlice3d.countInd,aes(x=Individuals,y=MutationCount),)+
 # roc.curve <- roc()
 
 options(width=2000)
+model.slice <- glm(survivalRate~MutationCount+I(MutationCount^2),family=binomial(),data=dataSlice2d.mutationCoun)
 model.all <- glm(survivalRate~MutationCount*MutationFrequency*Individuals*GrowthRate*Sterile,family=binomial(),data=groupedData)
+model.all <- glm(survivalRate~individualChance*MutationCount*MutationFrequency*(I(Individuals^2)+Individuals)*GrowthRate*Sterile,family=binomial(),data=groupedData)
 model.allaic <- step(model.all,direction='both') 
 
 model.sig <- glm(survivalRate ~ 
