@@ -62,7 +62,7 @@ early() {
 }
 
 
-1:10000 late() {
+1: late() {
 	//end condition 1: population crash
 	if (size(sim.subpopulations[1].individuals) == 0) {
 		cat("EXTINCT\n");

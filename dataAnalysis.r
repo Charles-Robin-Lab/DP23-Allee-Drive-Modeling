@@ -10,7 +10,7 @@ groupedData <- read.csv("./out.csv") %>%
 
 
 
-XlessgroupedData <- read.csv("./out.csv") %>%
+XlessgroupedData <- read.csv("./graphData.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
@@ -75,6 +75,12 @@ dataSlice2d.MutationCount <- filter(XlessgroupedData, MutationFrequency==0.11, I
 dataSlice2d.Lethal <- filter(XlessgroupedData, MutationFrequency==0.11, Individuals == 22, GrowthRate == 2, Sterile==0)
 dataSlice2d.Individuals <- filter(XlessgroupedData, MutationFrequency==0.11, MutationCount==61, GrowthRate == 2, Sterile==1)
 dataSlice2d.GrowthRate <- filter(XlessgroupedData, MutationFrequency==0.11, MutationCount==61, Individuals == 22, Sterile==1)
+
+dataSlice2d.MutationFrequency <- filter(XlessgroupedData, MutationCount==60, Individuals == 20, GrowthRate == 1, Sterile==1)
+dataSlice2d.MutationCount <- filter(XlessgroupedData, MutationFrequency==0.10, Individuals == 20, GrowthRate == 1, Sterile==1)
+dataSlice2d.Lethal <- filter(XlessgroupedData, MutationFrequency==0.10, Individuals == 20, GrowthRate == 2, Sterile==0)
+dataSlice2d.Individuals <- filter(XlessgroupedData, MutationFrequency==0.10, MutationCount==60, GrowthRate == 1, Sterile==1)
+dataSlice2d.GrowthRate <- filter(XlessgroupedData, MutationFrequency==0.10, MutationCount==60, Individuals == 20, Sterile==1)
 
 plot(survivalRate~MutationFrequency,data=dataSlice2d.MutationFrequency,ylim=c(0,1))
 plot(survivalRate~MutationCount,data=dataSlice2d.MutationCount,ylim=c(0,1))
@@ -152,5 +158,5 @@ y= data.frame(w=0)
 for (a in x) {
    y[nrow(y)+1,] = nrow(data[data$Time>a,])/nrow(data)
 }
-plot(x,y[2:62])
+plot(x,y[2:62,])
 # print(filter(data, Time>5000, Result == "EXTINCT"))
