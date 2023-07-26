@@ -3,23 +3,24 @@ initialize() {
 	setSeed(rdunif(1, 0, asInteger(2^62) - 1));
 	initializeSLiMModelType("nonWF");
 	defineConstantIfNotExist("mutsFrequency",0.10);
-	defineConstantIfNotExist("mutsCount",60);
+	defineConstantIfNotExist("mutsCount",100);
 	defineConstantIfNotExist("mutsHetFitnessDiff",0.000);
 	defineConstantIfNotExist("homozygousSterilityChance",1.0);
 	defineConstantIfNotExist("genomeSize",100000);
-	defineConstantIfNotExist("migrantsSize",20);
+	defineConstantIfNotExist("migrantsSize",100);
 	defineConstantIfNotExist("sterility",T);
 	defineConstantIfNotExist("xlinked",F);
 	defineConstantIfNotExist("maximalGrowthRate",1.0);
 	defineConstantIfNotExist("carryingCapacity",1000);
 	defineConstantIfNotExist("outputFilePath","./out1");
+	defineConstantIfNotExist("recombinationRate",1e-8);
 	defineGlobal("femaleReproductiveOutput", c(0.0,0.0));
 	
 	initializeMutationRate(0.0);
 	initializeMutationType("m0", 0.5, "f", 0.0);
 	initializeGenomicElementType("g0", m0, 1.0);
 	initializeGenomicElement(g0, 0, genomeSize-1);
-	initializeRecombinationRate(1e-4);
+	initializeRecombinationRate(recombinationRate);
 	initializeSex(xlinked ? "X" else "A");
 	
 	for (i in seqLen(mutsCount)+1) {
@@ -165,6 +166,7 @@ function (void)writeOutputData(string result) {
 		asString(mutsFrequency)+","+
 		asString(mutsCount)+","+
 		asString(maximalGrowthRate)+","+
+		asString(recombinationRate)+","+
 		asString(migrantsSize)+","+
 		asString(foundingMalesCount)+","+
 		asString(sterility)+","+
