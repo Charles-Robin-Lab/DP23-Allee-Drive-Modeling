@@ -1,30 +1,38 @@
 initialize() {
+	// setSeed(2073423208520);
 	setSeed(rdunif(1, 0, asInteger(2^62) - 1));
 	initializeSLiMModelType("nonWF");
-	defineConstantIfNotExist("mutsFrequency",0.13);
-	defineConstantIfNotExist("mutsCount",10);
-	defineConstantIfNotExist("mutsHetFitness",0.000);
+	defineConstantIfNotExist("mutsFrequency",0.10);
+	defineConstantIfNotExist("mutsCount",60);
+	defineConstantIfNotExist("mutsHetFitnessDiff",0.000);
 	defineConstantIfNotExist("homozygousSterilityChance",1.0);
-	defineConstantIfNotExist("genomeSize",99999);
+	defineConstantIfNotExist("genomeSize",100000);
 	defineConstantIfNotExist("migrantsSize",20);
 	defineConstantIfNotExist("sterility",T);
-	defineConstantIfNotExist("xlinked",T);
-	defineConstantIfNotExist("maximalGrowthRate",0.5);
+	defineConstantIfNotExist("xlinked",F);
+	defineConstantIfNotExist("maximalGrowthRate",1.0);
 	defineConstantIfNotExist("carryingCapacity",1000);
 	defineConstantIfNotExist("outputFilePath","./out1");
+	defineGlobal("femaleReproductiveOutput", c(0.0,0.0));
 	
 	initializeMutationRate(0.0);
 	initializeMutationType("m0", 0.5, "f", 0.0);
 	initializeGenomicElementType("g0", m0, 1.0);
-	initializeGenomicElement(g0, 0, genomeSize);
-	initializeRecombinationRate(1e-8);
+	initializeGenomicElement(g0, 0, genomeSize-1);
+	initializeRecombinationRate(1e-4);
 	initializeSex(xlinked ? "X" else "A");
 	
-	for (i in 1:mutsCount) {
-		mut = initializeMutationType("m"+asString(i) , 1.0, "f", mutsHetFitness);
+	for (i in seqLen(mutsCount)+1) {
+		mut = initializeMutationType("m"+asString(i) , 1.0, "f", mutsHetFitnessDiff);
 		mut.color = "green"; 
 //		gelement = initializeGenomicElementType("g"+asString(i), mut, 1.0);
 //		initializeGenomicElement(gelement, asInteger(genomeSize/mutsCount*(i-1)), asInteger(genomeSize/mutsCount*i-1));
+	}
+}
+
+function (void)defineConstantIfNotExist(string$ symbol, * value) {
+	if (!exists(symbol)) {
+		defineConstant(symbol,value);	
 	}
 }
 
@@ -33,17 +41,11 @@ initialize() {
 	sim.addSubpop(1, 0);
 }
 
-early() {
-	//kill old individuals
-	inds = sim.subpopulations.individuals; 
-	sim.killIndividuals(inds[inds.age >= 1]);
-}
-
 1 late() {
 	// add mutations
 	muts = community.allMutationTypes;
 	possibleCarrierChromosomes = sim.subpopulations.individuals.genomes[!(sim.subpopulations.individuals.genomes.isNullGenome)];
-	for (i in 1:mutsCount) {
+	for (i in seqLen(mutsCount)+1) {
 		sample(
 			possibleCarrierChromosomes, 
 			asInteger(mutsFrequency*size(possibleCarrierChromosomes))
@@ -61,40 +63,34 @@ early() {
 	defineConstant("foundingMalesCount",sum(migrants.sex=="M"));
 }
 
-
-1: late() {
-	//end condition 1: population crash
-	if (size(sim.subpopulations[1].individuals) == 0) {
-		cat("EXTINCT\n");
-		writeOutputData("EXTINCT");
-		sim.simulationFinished();
+first() {
+	//reproductive output calculations
+	for (subpop in sim.subpopulations)
+	{
+		femaleCount = size(subpop.individuals[subpop.individuals.sex =='F']);
+		if (subpop.individualCount==0 | femaleCount==0) {
+			femaleReproductiveOutput[subpop.id]=0;
+			next;
+		}
+		effectivePopulationSize = 4*femaleCount*(subpop.individualCount-femaleCount)/subpop.individualCount;
+		femaleReproductiveOutput[subpop.id] = (subpop.individualCount+maximalGrowthRate*effectivePopulationSize*(1-effectivePopulationSize/carryingCapacity))/femaleCount;
+		
+		print(femaleCount);
+		print(subpop.individualCount);
+		print(effectivePopulationSize);
+		print(femaleReproductiveOutput);
 	}
-	//end condition 2: survival
-	if (size(sim.subpopulations[1].individuals) >= carryingCapacity) {
-		cat("SURVIVED\n");
-		writeOutputData("SURVIVED");
-		sim.simulationFinished();
-	}
-	
 }
-250 late() {
-	// //end condition 2: long term survival
-	// result = ifelse(size(sim.subpopulations[1].individuals) >= 0.6*carryingCapacity,"SURVIVED","UNDECIDED");
-	// cat(result+"\n");
-	// writeOutputData(result);
-	// sim.simulationFinished();
 
-}
 
 reproduction(NULL, "F") {
 	//steriles dont reproduce
 	if (sterility)
 		if (any(2<=copiesOfMutations(individual, community.allMutationTypes)))
 			return;
-	
 	//produce offspring
-	growthRate=max(maximalGrowthRate*(1-subpop.individualCount/carryingCapacity),-1.9999999);
-	for (i in seqLen(rpois(1, 2*(growthRate+1)))) {
+	growthRate=max(femaleReproductiveOutput[subpop.id],-1.9999999);
+	for (i in seqLen(rpois(1, growthRate))) {
 		mate = subpop.sampleIndividuals(1, sex="M");	
 		if (size(mate)) {
 			subpop.addCrossed(individual, mate);
@@ -130,6 +126,37 @@ function (integer)copiesOfMutations(o<Individual>$ ind, o<MutationType> mutTypes
 	return out;
 }
 
+early() {
+	//kill old individuals
+	inds = sim.subpopulations.individuals; 
+	sim.killIndividuals(inds[inds.age >= 1]);
+}
+
+1: late() {
+	//end condition 1: population crash
+	if (size(sim.subpopulations[1].individuals) == 0) {
+		cat("EXTINCT\n");
+		writeOutputData("EXTINCT");
+		sim.simulationFinished();
+	}
+	//end condition 2: survival
+	if (size(sim.subpopulations[1].individuals) >= carryingCapacity) {
+		cat("SURVIVED\n");
+		writeOutputData("SURVIVED");
+		sim.simulationFinished();
+	}
+	
+}
+
+2000 late() {
+	//end condition 2: long term survival
+	result = size(sim.subpopulations[1].individuals) >= 0.8*carryingCapacity ? "SURVIVED" else "LOADED_SURVIVAL";
+	cat(result+"\n");
+	writeOutputData(result);
+	sim.simulationFinished();
+
+}
+
 function (void)writeOutputData(string result) {
 	writeFile(outputFilePath, 
 		asString(getSeed())+","+ 
@@ -143,10 +170,4 @@ function (void)writeOutputData(string result) {
 		asString(sterility)+","+
 		asString(xlinked)
 	, append = T);
-}
-
-function (void)defineConstantIfNotExist(string$ symbol, * value) {
-	if (!exists(symbol)) {
-		defineConstant(symbol,value);	
-	}
 }
