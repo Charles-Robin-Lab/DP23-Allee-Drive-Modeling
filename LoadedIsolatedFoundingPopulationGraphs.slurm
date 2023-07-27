@@ -55,12 +55,15 @@ if [[ "${BASH_VERSION}" < "4.3.0" ]]; then
     exit 1
 fi
 
-# Write csv header if outputfile doesnt exist
+# Write csv header
 outputFile="out_$SLURM_ARRAY_JOB_ID.csv"
-if [ ! -f "$outputFile" ]; then
-   echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
+if ["$SLURM_ARRAY_TASK_ID"=="1"]; then
+   echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,RecombinationRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 fi
-
+# Wait for csv to exist
+while [! -f "$outputFile"]; do
+  :
+done
 # check sources
 bcpriSourcePath="../Bash-Command-Parameter-Ranges-Iterator/BashCommandParameterRangesIterator.sh"
 if [ ! -f "$bcpriSourcePath" ]; then

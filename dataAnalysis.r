@@ -10,13 +10,27 @@ groupedData <- read.csv("./out.csv") %>%
 
 
 
-XlessgroupedData <- read.csv("./graphData.csv") %>%
+XlessgroupedData <- read.csv("./newReproductionGraphs.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, survivalRate,count) %>% 
   summarise()
 
+
+recombinationComparisonData <- read.csv("./recombinationComparison.csv") %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, RecombinationRate) %>% 
+  mutate(count = n()) %>%
+  mutate(anySurvivalRate = sum(Result == "SURVIVED" | Result == "LOADED_SURVIVAL") / count) %>%
+  mutate(loadSurvivalRate = sum(Result == "LOADED_SURVIVAL") / count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, RecombinationRate, anySurvivalRate, loadSurvivalRate,count) %>% 
+  summarise()
+
+plot(anySurvivalRate~RecombinationRate,data=recombinationComparisonData,ylim=c(0,1),log="x")
+par(new=TRUE)
+plot(loadSurvivalRate~RecombinationRate,data=recombinationComparisonData,pch = 19,ylim=c(0,1),log="x")
+par(new=TRUE)
+plot(anySurvivalRate-loadSurvivalRate~RecombinationRate,data=recombinationComparisonData,pch = 2,ylim=c(0,1),log="x")
   
 
 xtestData <- read.csv("./out.csv") %>%
@@ -76,11 +90,18 @@ dataSlice2d.Lethal <- filter(XlessgroupedData, MutationFrequency==0.11, Individu
 dataSlice2d.Individuals <- filter(XlessgroupedData, MutationFrequency==0.11, MutationCount==61, GrowthRate == 2, Sterile==1)
 dataSlice2d.GrowthRate <- filter(XlessgroupedData, MutationFrequency==0.11, MutationCount==61, Individuals == 22, Sterile==1)
 
+
+
+
+# MutationCount==60, MutationFrequency==0.10, Individuals == 20, GrowthRate == 1, Sterile==1
+
 dataSlice2d.MutationFrequency <- filter(XlessgroupedData, MutationCount==60, Individuals == 20, GrowthRate == 1, Sterile==1)
 dataSlice2d.MutationCount <- filter(XlessgroupedData, MutationFrequency==0.10, Individuals == 20, GrowthRate == 1, Sterile==1)
 dataSlice2d.Lethal <- filter(XlessgroupedData, MutationFrequency==0.10, Individuals == 20, GrowthRate == 2, Sterile==0)
 dataSlice2d.Individuals <- filter(XlessgroupedData, MutationFrequency==0.10, MutationCount==60, GrowthRate == 1, Sterile==1)
 dataSlice2d.GrowthRate <- filter(XlessgroupedData, MutationFrequency==0.10, MutationCount==60, Individuals == 20, Sterile==1)
+
+
 
 plot(survivalRate~MutationFrequency,data=dataSlice2d.MutationFrequency,ylim=c(0,1))
 plot(survivalRate~MutationCount,data=dataSlice2d.MutationCount,ylim=c(0,1))
