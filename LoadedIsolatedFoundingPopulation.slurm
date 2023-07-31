@@ -64,6 +64,9 @@ fi
 while [! -f "$outputFile"]; do
   :
 done
+
+sleep 1
+
 # check sources
 bcpriSourcePath="../Bash-Command-Parameter-Ranges-Iterator/BashCommandParameterRangesIterator.sh"
 if [ ! -f "$bcpriSourcePath" ]; then
