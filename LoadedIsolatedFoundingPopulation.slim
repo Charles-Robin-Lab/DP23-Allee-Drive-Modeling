@@ -133,7 +133,7 @@ early() {
 	sim.killIndividuals(inds[inds.age >= 1]);
 }
 
-1: late() {
+1:1999 late() {
 	//end condition 1: population crash
 	if (size(sim.subpopulations[1].individuals) == 0) {
 		cat("EXTINCT\n");
@@ -151,7 +151,7 @@ early() {
 
 2000 late() {
 	//end condition 2: long term survival
-	result = size(sim.subpopulations[1].individuals) >= 0.8*carryingCapacity ? "SURVIVED" else "LOADED_SURVIVAL";
+	result = "LOADED_SURVIVAL";
 	cat(result+"\n");
 	writeOutputData(result);
 	sim.simulationFinished();
