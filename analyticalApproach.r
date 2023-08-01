@@ -38,6 +38,5 @@ for (i in 1:replicates) {
             break;
         }
     }
-    # print(df)
 }
 print(1-count/replicates)

@@ -19,49 +19,118 @@ XlessgroupedData <- read.csv("./newReproductionGraphs.csv") %>%
 
 
 recombinationComparisonData <- read.csv("./recombinationComparison.csv") %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, RecombinationRate) %>% 
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate) %>% 
   mutate(count = n()) %>%
   mutate(anySurvivalRate = sum(Result == "SURVIVED" | Result == "LOADED_SURVIVAL") / count) %>%
   mutate(loadSurvivalRate = sum(Result == "LOADED_SURVIVAL") / count) %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, RecombinationRate, anySurvivalRate, loadSurvivalRate,count) %>% 
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate, anySurvivalRate, loadSurvivalRate,count) %>% 
   summarise()
 
-plot(anySurvivalRate~RecombinationRate,data=recombinationComparisonData,ylim=c(0,1),log="x")
+
+
+
+plot(anySurvivalRate~RecombinationRate,ylab="Surivival Rate",data=filter(recombinationComparisonData, Xlinked==0),ylim=c(0,1),log="x")
 par(new=TRUE)
-plot(loadSurvivalRate~RecombinationRate,data=recombinationComparisonData,pch = 19,ylim=c(0,1),log="x")
+plot(loadSurvivalRate~RecombinationRate,ylab="",data=filter(recombinationComparisonData, Xlinked==0),pch = 19,ylim=c(0,1),log="x")
 par(new=TRUE)
-plot(anySurvivalRate-loadSurvivalRate~RecombinationRate,data=recombinationComparisonData,pch = 2,ylim=c(0,1),log="x")
+plot(anySurvivalRate-loadSurvivalRate~RecombinationRate,ylab="",data=filter(recombinationComparisonData, Xlinked==0),pch = 2,ylim=c(0,1),log="x")
+abline(v=0.00101, col="blue")
+abline(v=1.0e-5, col="red")
+
+
+par(new=TRUE) 
+
+
+plot(anySurvivalRate~RecombinationRate,data=filter(recombinationComparisonData, Xlinked==1),ylim=c(0,1),log="x")
+par(new=TRUE)
+plot(loadSurvivalRate~RecombinationRate,data=filter(recombinationComparisonData, Xlinked==1),pch = 19,ylim=c(0,1),log="x")
+par(new=TRUE)
+plot(anySurvivalRate-loadSurvivalRate~RecombinationRate,data=filter(recombinationComparisonData, Xlinked==1),pch = 2,ylim=c(0,1),log="x")
   
 
-xtestData <- read.csv("./out.csv") %>%
+xtestData <- read.csv("./out_49786075.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
-  filter(survivalRate<0.975 && survivalRate>0.025) %>%
+  filter(survivalRate<0.5 && survivalRate>0.025) %>%
   ungroup()  %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count) %>% 
   summarise()
+xtestData <- read.csv("./out_49786075.csv") %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
+  mutate(count = n()) %>%
+  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
+  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
+  filter(survivalRate==0.5) %>%
+  ungroup()  %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
+  mutate(count = n()) %>%
+  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count) %>% 
+  summarise()
+xtestData <- read.csv("./out.csv") %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
+  mutate(count = n()) %>%
+  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count) %>% 
+  summarise()
 
-xlinkedDiffs <- xtestData[xtestData$Xlinked==1,]$survivalRate-xtestData[xtestData$Xlinked==0,]$survivalRate
-hist(xlinkedDiffs,breaks = c(-0.3,-0.2,-0.15,-0.1,-0.05,-0.02,-0.01,0.01,0.02,0.05,0.1,0.15,0.2,0.3))
+xlessData <- subset(xtestData[xtestData$Xlinked==1,], select = -c(Xlinked, survivalRate))
+xlessData$xlinkedDiffs <- xtestData[xtestData$Xlinked==1,]$survivalRate-xtestData[xtestData$Xlinked==0,]$survivalRate
+cor(xlessData$xlinkedDiffs,xlessData)
+hist(xlessData$xlinkedDiffs,breaks = seq(from=-0.405, to=0.405, by=0.01))
+par(new=TRUE)
+plot(seq(from=-0.405, to=0.405, by=0.01),dnorm(seq(from=-200*0.405, to=200*0.405, by=200*0.01),mean=0.0,sd=sqrt(100*2*0.5*0.5)))
+
+# https://gist.github.com/coppeliaMLA/9681819
+
+diffBin<-function(z, n1, p1, n2, p2){
+
+  prob<-0
+  
+  if (z>=0){  
+    for (i in 0:n1){     
+      prob<-prob+dbinom(i+z, n1, p1)*dbinom(i, n2, p2)
+    }
+    
+  }
+  else
+  {
+    for (i in 0:n2){     
+      prob<-prob+dbinom(i+z, n1, p1)*dbinom(i, n2, p2)
+    }
+  }
+  return(prob)
+}
+
+#Example
+n1<-100
+p1<-0.5
+n2<-100
+p2<-0.5
+s<-(-n2):n1
+
+p<-sapply(s, function(x) diffBin(x, n1, p1, n2, p2))
+plot(s,338800*p,ylim=c(0,1000),xlim=c(-40,40))
+
 
 steriletestData <- read.csv("./out.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Xlinked) %>% 
   mutate(count = n()) %>%
-  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
-  filter(survivalRate<0.975 && survivalRate>0.025) %>%
+  mutate(expectedSurvivalRate = sum(Result != "EXTINCT") / count) %>%
+  filter(expectedSurvivalRate<0.975 && expectedSurvivalRate>0.025) %>%
   ungroup()  %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
   mutate(count = n()) %>%
-  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
+  mutate(survivalRate = sum(Result != "EXTINCT") / count) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count) %>% 
   summarise()
 sterileDiffs <- steriletestData[steriletestData$Sterile==1,]$survivalRate-steriletestData[steriletestData$Sterile==0,]$survivalRate
-hist(sterileDiffs,breaks = c(-1.0,-0.9,-0.8,-0.7,-0.6,-0.5,-0.4,-0.3,-0.2,-0.1,-0.0375,0.0375,0.1,0.2,0.3))
-boxplot(sterileDiffs,xlinkedDiffs)
+hist(sterileDiffs,breaks = seq(from=-0.805, to=0.405, by=0.01))
+boxplot(sterileDiffs,xlessData$xlinkedDiffs)
 
 
 XlessgroupedData <- XlessgroupedData %>%
@@ -107,6 +176,10 @@ plot(survivalRate~MutationFrequency,data=dataSlice2d.MutationFrequency,ylim=c(0,
 plot(survivalRate~MutationCount,data=dataSlice2d.MutationCount,ylim=c(0,1))
 plot(survivalRate~Individuals,data=dataSlice2d.Individuals,ylim=c(0,1))
 plot(survivalRate~GrowthRate,data=dataSlice2d.GrowthRate,ylim=c(0,1))
+library(ggplot2)
+
+p <- ggplot(ToothGrowth, aes(x=MutationCount, y=survivalRate)) + 
+  geom_violin()
 
 
 
