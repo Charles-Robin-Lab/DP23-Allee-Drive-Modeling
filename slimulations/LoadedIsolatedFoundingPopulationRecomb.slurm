@@ -81,7 +81,7 @@ module load slim/4.0.1
 source $bcpriSourcePath
 
 declare -A paramRanges=(
-  ["maximalGrowthRate"]=1.0
+  ["maximalGrowthRate"]=4.0
   ["migrantsSize"]=100
   ["mutsFrequency"]=0.1
   ["mutsCount"]=100

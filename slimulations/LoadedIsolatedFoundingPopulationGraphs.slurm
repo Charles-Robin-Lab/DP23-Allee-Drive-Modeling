@@ -101,7 +101,7 @@ source $bcpriSourcePath
 
 # nice graphs
 declare -A paramRanges=(
-  ["maximalGrowthRate"]=$(seq 0.1 0.02 2.5)
+  ["maximalAverageFemaleOffspring"]=$(seq 2.2 0.04 7)
   ["migrantsSize"]=20
   ["mutsFrequency"]=0.1
   ["mutsCount"]=60
@@ -110,7 +110,7 @@ declare -A paramRanges=(
 
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
-  ["maximalGrowthRate"]=1
+  ["maximalAverageFemaleOffspring"]=4.0
   ["migrantsSize"]=$(seq 2 1 120)
   ["mutsFrequency"]=0.1
   ["mutsCount"]=60
@@ -119,7 +119,7 @@ declare -A paramRanges=(
 
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
-  ["maximalGrowthRate"]=1
+  ["maximalAverageFemaleOffspring"]=4.0
   ["migrantsSize"]=20
   ["mutsFrequency"]=$(seq 0.04 0.002 0.15)
   ["mutsCount"]=60
@@ -128,7 +128,7 @@ declare -A paramRanges=(
 
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
-  ["maximalGrowthRate"]=1
+  ["maximalAverageFemaleOffspring"]=4.0
   ["migrantsSize"]=20
   ["mutsFrequency"]=0.1
   ["mutsCount"]=$(seq 1 1 120)
