@@ -1,6 +1,6 @@
 library(dplyr)
 
-groupedData <- read.csv("../data/out.csv") %>%
+groupedData <- read.csv("./data/out.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%

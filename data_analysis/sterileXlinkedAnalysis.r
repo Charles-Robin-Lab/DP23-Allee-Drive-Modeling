@@ -4,7 +4,7 @@ library(dplyr)
 
 
 
-xtestData <- read.csv("../data/out_49786075.csv") %>%
+xtestData <- read.csv("./data/out_49786075.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
@@ -16,7 +16,7 @@ xtestData <- read.csv("../data/out_49786075.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count) %>% 
   summarise()
 
-xtestData <- read.csv("../data/out_49786075.csv") %>%
+xtestData <- read.csv("./data/out_49786075.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%

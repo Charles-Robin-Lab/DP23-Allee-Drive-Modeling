@@ -1,11 +1,12 @@
 maxGrowthRate=1.0;
 carryingCapacity=1000;
-N=100
+N=10
 intitialMutFreq=0.10
 mutatedGenes=100;
 
 print(N)
 mutFreq = rep(intitialMutFreq,mutatedGenes);
+print(mutFreq[1])
 while (N>0 && N<0.5*carryingCapacity) {
     # kill off things
     for (i in 1:mutatedGenes) {
@@ -17,14 +18,27 @@ while (N>0 && N<0.5*carryingCapacity) {
         mutFreq[i]=nMutFreq
     }
     N=round(N)
-
+    mutFreq=round(mutFreq*2*N)/(2*N)
+    # reproduce
     nN = N + maxGrowthRate*N*(1-N/carryingCapacity) ;
     nN=round(nN)
+    mutFreq=round(mutFreq*2*nN)/(2*nN)
 
     # t+1
     N = nN;
     print(N)
+    print(mutFreq[1])
 }
+
+
+# Pulling slim apart:
+# -initial sampling bias
+# -binomial sexing
+# -lethality
+# -variance in reproductive output (poisson of lambda)
+# -gene drift (allele frequency)
+# -HW drift (genotype frequency)
+# -binomial sexing
 
 
 # t=0

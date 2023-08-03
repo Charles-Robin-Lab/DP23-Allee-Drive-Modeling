@@ -1,13 +1,13 @@
 library(dplyr)
 
-groupedData <- read.csv("../data/out.csv") %>%
+groupedData <- read.csv("./data/out.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count) %>% 
   summarise()
 autosomalData <- groupedData[groupedData$Xlinked==0,]
-groupedGraphData <- read.csv("../data/graphData.csv") %>%
+groupedGraphData <- read.csv("./data/graphData.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
