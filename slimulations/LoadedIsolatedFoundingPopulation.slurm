@@ -30,8 +30,8 @@
 #SBATCH --mail-type=END
 
 # log output files
-#SBATCH -o logs/slurm.%N.%j.out # STDOUT 
-#SBATCH -e logs/slurm.%N.%j.err # STDERR
+#SBATCH -o ../logs/slurm.%N.%j.out # STDOUT 
+#SBATCH -e ../logs/slurm.%N.%j.err # STDERR
 
 # The maximum running time of the job in days-hours:mins:sec
 #SBATCH --time=1-0:0:00
