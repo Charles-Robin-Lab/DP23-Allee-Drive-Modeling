@@ -1,4 +1,6 @@
 
+library(dplyr)
+
 recombinationComparisonData <- read.csv("./data/recombinationComparison2.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate) %>% 
   mutate(count = n()) %>%
@@ -10,7 +12,7 @@ recombinationComparisonData <- read.csv("./data/recombinationComparison2.csv") %
 
 
 
-plot(survivalRate+loadedSurvivalRate~RecombinationRate,ylab="Surivival Rate",data=filter(recombinationComparisonData, Xlinked==0),ylim=c(0,1),log="x")
+plot(survivalRate+loadSurvivalRate~RecombinationRate,ylab="Surivival Rate",data=filter(recombinationComparisonData, Xlinked==0),ylim=c(0,1),log="x")
 par(new=TRUE)
 plot(loadSurvivalRate~RecombinationRate,ylab="",data=filter(recombinationComparisonData, Xlinked==0),pch = 19,ylim=c(0,1),log="x")
 par(new=TRUE)
