@@ -57,7 +57,7 @@ fi
 
 # Write csv header
 outputFile="out_$SLURM_ARRAY_JOB_ID.csv"
-if ["$SLURM_ARRAY_TASK_ID"=="1"]; then
+if [ "$SLURM_ARRAY_TASK_ID" == "1" ]; then
    echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,RecombinationRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 fi
 # Wait for csv to exist
