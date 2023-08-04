@@ -30,8 +30,8 @@
 #SBATCH --mail-type=END
 
 # log output files
-#SBATCH -o logs/slurm.%N.%j.out # STDOUT 
-#SBATCH -e logs/slurm.%N.%j.err # STDERR
+#SBATCH -o ../logs/slurm.%N.%j.out # STDOUT 
+#SBATCH -e ../logs/slurm.%N.%j.err # STDERR
 
 # The maximum running time of the job in days-hours:mins:sec
 #SBATCH --time=1-0:0:00
@@ -56,7 +56,7 @@ if [[ "${BASH_VERSION}" < "4.3.0" ]]; then
 fi
 
 # Write csv header
-outputFile="out_$SLURM_ARRAY_JOB_ID.csv"
+outputFile="./data/out_$SLURM_ARRAY_JOB_ID.csv"
 if [ "$SLURM_ARRAY_TASK_ID" == "1" ]; then
    echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,RecombinationRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 fi
