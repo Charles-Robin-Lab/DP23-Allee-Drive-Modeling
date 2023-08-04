@@ -61,7 +61,7 @@ if ["$SLURM_ARRAY_TASK_ID"=="1"]; then
    echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,RecombinationRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 fi
 # Wait for csv to exist
-while [! -f "$outputFile"]; do
+while [ ! -f "$outputFile" ]; do
   :
 done
 
