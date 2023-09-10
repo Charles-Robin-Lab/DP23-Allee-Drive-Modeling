@@ -36,7 +36,7 @@
 # The maximum running time of the job in days-hours:mins:sec
 #SBATCH --time=1-0:0:00
 # Parralelise the computation
-#SBATCH --array=1-100
+#SBATCH --array=1-1200
 
 # # # File and version checks 
 

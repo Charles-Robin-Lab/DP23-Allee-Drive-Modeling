@@ -1,11 +1,11 @@
-#!/usr/local/easybuild-2019/easybuild/software/compiler/gcc/11.2.0/bash/4.3/bin/bash
+#! /bin/bash
 # Created by the University of Melbourne job script generator for SLURM
 # Thu May 18 2023 02:25:29 GMT+1000 (Australian Eastern Standard Time)
 
 # # # Settings for Sbatch
 
 # Partition for the job:
-#SBATCH --partition=physical
+#SBATCH --partition=cascade
 
 # Multithreaded (SMP) job: must run on one node 
 #SBATCH --nodes=1
@@ -77,7 +77,7 @@ fi
 # # # run job code
 
 # Source files
-module load slim/4.0.1
+module load SLiM/4.0.1
 source $bcpriSourcePath
 
 declare -A paramRanges=(
