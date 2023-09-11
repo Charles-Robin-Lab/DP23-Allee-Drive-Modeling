@@ -56,7 +56,7 @@ if [[ "${BASH_VERSION}" < "4.3.0" ]]; then
 fi
 
 # Write csv header
-outputFile="out_$SLURM_ARRAY_JOB_ID.csv"
+outputFile="./data/out_$SLURM_ARRAY_JOB_ID.csv"
 if [ "$SLURM_ARRAY_TASK_ID" == "1" ]; then
    echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,RecombinationRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 fi
@@ -108,7 +108,7 @@ declare -A paramRanges=(
   ["sterility"]=$(seq 0 1 1)
 )
 
-runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d outputFilePath='$outputFile' %s slimulations/LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]=4.0
   ["migrantsSize"]=$(seq 2 1 120)
@@ -117,7 +117,7 @@ declare -A paramRanges=(
   ["sterility"]=$(seq 0 1 1)
 )
 
-runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d outputFilePath='$outputFile' %s slimulations/LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]=4.0
   ["migrantsSize"]=20
@@ -126,7 +126,7 @@ declare -A paramRanges=(
   ["sterility"]=$(seq 0 1 1)
 )
 
-runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d outputFilePath='$outputFile' %s slimulations/LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]=4.0
   ["migrantsSize"]=20
