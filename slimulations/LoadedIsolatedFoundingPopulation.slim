@@ -14,13 +14,23 @@ initialize() {
 	defineConstantIfNotExist("carryingCapacity",1000);
 	defineConstantIfNotExist("outputFilePath","../data/out1.csv");
 	defineConstantIfNotExist("recombinationRate",1e-6);
+//	WARNING: spacing between mutations undefined if mutations % chromosomeCount != 0
+	defineConstantIfNotExist("chromosomeCount",1);
 	defineGlobal("femaleReproductiveOutput", c(0.0,0.0));
 	
 	initializeMutationRate(0.0);
 	initializeMutationType("m0", 0.5, "f", 0.0);
 	initializeGenomicElementType("g0", m0, 1.0);
 	initializeGenomicElement(g0, 0, genomeSize-1);
-	initializeRecombinationRate(recombinationRate);
+	rates = c(recombinationRate, rep(c(0.5,recombinationRate),chromosomeCount-1));
+	ends = integer(0);
+	for (i in seqLen(max(chromosomeCount-1,0))+1) {
+		ends = c(ends,asInteger(genomeSize*(i)/chromosomeCount-1),asInteger(genomeSize*(i)/chromosomeCount));
+	}
+	ends =  c(ends,genomeSize-1);
+	print(ends);
+	print(rates);
+	initializeRecombinationRate(rates, ends);
 	initializeSex(xlinked ? "X" else "A");
 	
 	for (i in seqLen(mutsCount)+1) {
@@ -50,7 +60,7 @@ function (void)defineConstantIfNotExist(string$ symbol, * value) {
 		sample(
 			possibleCarrierChromosomes, 
 			asInteger(mutsFrequency*size(possibleCarrierChromosomes))
-		).addNewDrawnMutation(muts[i], asInteger(genomeSize*(i-0.5)/mutsCount));
+		).addNewDrawnMutation(muts[i], asInteger(genomeSize*(i-1)/mutsCount));
 	}
 	// create founder population
 	if (size(sim.subpopulations[0].individuals) > migrantsSize) {
@@ -137,13 +147,13 @@ early() {
 	//end condition 1: population crash
 	if (size(sim.subpopulations[1].individuals) == 0) {
 		cat("EXTINCT\n");
-		writeOutputData("EXTINCT");
+		if (!exists("slimgui")) {writeOutputData("EXTINCT");}
 		sim.simulationFinished();
 	}
 	//end condition 2: survival
 	if (size(sim.subpopulations[1].individuals) >= carryingCapacity) {
 		cat("SURVIVED\n");
-		writeOutputData("SURVIVED");
+		if (!exists("slimgui")) {writeOutputData("SURVIVED");}
 		sim.simulationFinished();
 	}
 	
@@ -153,7 +163,7 @@ early() {
 	//end condition 2: long term survival
 	result = "LOADED_SURVIVAL";
 	cat(result+"\n");
-	writeOutputData(result);
+	if (!exists("slimgui")) {writeOutputData(result);}
 	sim.simulationFinished();
 
 }
