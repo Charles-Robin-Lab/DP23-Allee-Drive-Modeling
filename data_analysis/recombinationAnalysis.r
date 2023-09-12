@@ -1,7 +1,7 @@
 
 library(dplyr)
 
-recombinationComparisonData <- read.csv("./data/recombinationComparison2.csv") %>%
+recombinationComparisonData <- read.csv("./data/BHSRecomb100.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED" ) / count) %>%
@@ -36,13 +36,14 @@ library(scales)
 # create data
 autosomalRecombinationComparisonData<- filter(recombinationComparisonData, Xlinked==0)
 RecombinationRate <- rep(autosomalRecombinationComparisonData$RecombinationRate,times=3)
-viability <- c(1-autosomalRecombinationComparisonData$survivalRate - autosomalRecombinationComparisonData$loadSurvivalRate,autosomalRecombinationComparisonData$loadSurvivalRate,autosomalRecombinationComparisonData$survivalRate)
+outcomeProportion <- c(1-autosomalRecombinationComparisonData$survivalRate - autosomalRecombinationComparisonData$loadSurvivalRate,autosomalRecombinationComparisonData$loadSurvivalRate,autosomalRecombinationComparisonData$survivalRate)
 outcomeGroup <- rep(c("EXTINCTION","LOADED_SURVIVAL","SURVIVAL"),each=length(autosomalRecombinationComparisonData$RecombinationRate))
 data <- data.frame(RecombinationRate, viability, outcomeGroup)
 
 # stacked area chart
-ggplot(data,log="x", aes(x=RecombinationRate, y=viability, fill=outcomeGroup)) + 
+ggplot(data,log="x", aes(x=RecombinationRate, y=outcomeProportion, fill=outcomeGroup)) + 
     geom_area() +
-    scale_x_continuous(trans='log10',limits = c(1e-15, 1e-3),
-    breaks = trans_breaks("log10", function(x) 10^(x)))
-    + annotation_logticks()
+    scale_x_continuous(trans='log10',limits = c(min(RecombinationRate[RecombinationRate!=0]), max(RecombinationRate)),
+    breaks = trans_breaks("log10", function(x) 10^(x)),expand = c(0,0)) +
+    scale_y_continuous(expand = c(0, 0)) +
+    annotation_logticks(sides="b")
