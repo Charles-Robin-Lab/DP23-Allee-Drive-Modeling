@@ -6,7 +6,7 @@ mutatedGenes=100;
 
 print(N)
 mutFreq = rep(intitialMutFreq,mutatedGenes);
-print(mutFreq[1])
+# print(mutFreq[1])
 while (N>0 && N<0.5*carryingCapacity) {
     # kill off things
     for (i in 1:mutatedGenes) {
@@ -27,18 +27,18 @@ while (N>0 && N<0.5*carryingCapacity) {
     # t+1
     N = nN;
     print(N)
-    print(mutFreq[1])
+    # print(mutFreq[1])
 }
 
 
 # Pulling slim apart:
-# -initial sampling bias
-# -binomial sexing
-# -lethality
-# -variance in reproductive output (poisson of lambda)
-# -gene drift (allele frequency)
-# -HW drift (genotype frequency)
-# -binomial sexing
+# - initial sampling bias
+# - binomial sexing
+# - lethality
+# - variance in reproductive output (poisson of lambda)
+# - genetic drift (allele frequency)
+# - HW drift (genotype frequency)
+# - binomial sexing
 
 
 # t=0
@@ -53,8 +53,6 @@ while (N>0 && N<0.5*carryingCapacity) {
 
 
 # discretising:
-# - 3.88 individuals?
-# - N never reaches 0
 # - are these males or females
 
 # error bars
