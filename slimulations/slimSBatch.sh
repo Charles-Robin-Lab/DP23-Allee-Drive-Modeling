@@ -55,20 +55,21 @@ if [ ! -f "$bcpriSourcePath" ]; then
     echo "Error: Bash-Command-Parameter-Ranges-Iterator not found please download from https://github.com/4321louis/Bash-Command-Parameter-Ranges-Iterator and edit this script to point to it"
     exit 1
 fi
+sbatchOptions+=" --export=bcpriSourcePath=$bcpriSourcePath" 
 
 # # # run job code
 
 # Source files
 module load SLiM/4.0.1
-source $bcpriSourcePath
 
 
 # Write csv header
 outputFile="$projectDir/data/out_${jobName}.csv"
 echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,RecombinationRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
+sbatchOptions+=" --export=outputFile=$outputFile" 
 
 # Runscript
-cmd="sbatch ${sbatchOptions} --chdir=$projectDir --export=outputFile=$outputFile $slurmscript"
+cmd="sbatch ${sbatchOptions} --chdir=$projectDir $slurmscript"
 echo $cmd
 $cmd
 

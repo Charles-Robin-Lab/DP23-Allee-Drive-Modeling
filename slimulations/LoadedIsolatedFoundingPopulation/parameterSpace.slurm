@@ -8,6 +8,7 @@
 # Parralelise the computation
 #SBATCH --array=1-1200
 
+source $bcpriSourcePath
 # full
 # declare -A paramRanges=(
 #   ["maximalGrowthRate"]=$(seq 0.1 0.1 1.5) $(seq 2 0.5 10)
