@@ -2,20 +2,21 @@ initialize() {
 	// setSeed(2073423208520);
 	setSeed(rdunif(1, 0, asInteger(2^62) - 1));
 	initializeSLiMModelType("nonWF");
-	defineConstantIfNotExist("mutsFrequency",0.05);
-	defineConstantIfNotExist("mutsCount",100);
+	defineConstantIfNotExist("sexed",F);
+	defineConstantIfNotExist("mutsFrequency",0.015);
+	defineConstantIfNotExist("mutsCount",400);
 	defineConstantIfNotExist("mutsHetFitnessDiff",0.000);
 	defineConstantIfNotExist("homozygousSterilityChance",1.0);
 	defineConstantIfNotExist("genomeSize",100e+6);
 	defineConstantIfNotExist("migrantsSize",25);
-	defineConstantIfNotExist("sterility",T);
+	defineConstantIfNotExist("sterility",F);
 	defineConstantIfNotExist("xlinked",F);
 	defineConstantIfNotExist("maximalAverageFemaleOffspring",3.0);
 	defineConstantIfNotExist("carryingCapacity",1000);
 	defineConstantIfNotExist("outputFilePath","../data/out1.csv");
-	defineConstantIfNotExist("recombinationRate",2.46e-9);
+	defineConstantIfNotExist("recombinationRate",2.12e-8);
 //	WARNING: spacing between mutations undefined if mutations % chromosomeCount != 0
-	defineConstantIfNotExist("chromosomeCount",1);
+	defineConstantIfNotExist("chromosomeCount",4);
 	defineGlobal("femaleReproductiveOutput", c(0.0,0.0));
 	
 	initializeMutationRate(0.0);
@@ -29,13 +30,15 @@ initialize() {
 	}
 	ends =  c(ends,genomeSize-1);
 	initializeRecombinationRate(rates, ends);
-	initializeSex(xlinked ? "X" else "A");
+	if (sexed)
+	{
+		initializeSex(xlinked ? "X" else "A");
+	}
+	
 	
 	for (i in seqLen(mutsCount)+1) {
 		mut = initializeMutationType("m"+asString(i) , 1.0, "f", mutsHetFitnessDiff);
 		mut.color = "green"; 
-//		gelement = initializeGenomicElementType("g"+asString(i), mut, 1.0);
-//		initializeGenomicElement(gelement, asInteger(genomeSize/mutsCount*(i-1)), asInteger(genomeSize/mutsCount*i-1));
 	}
 }
 
@@ -80,19 +83,17 @@ first() {
 			femaleReproductiveOutput[subpop.id]=0;
 			next;
 		}
-		femaleCount = size(subpop.individuals[subpop.individuals.sex =='F']);
-//		femaleReproductiveOutput[subpop.id] = maximalAverageFemaleOffspring/(1+subpop.individualCount/M);
+		femaleCount = !sexed ? size(subpop.individuals) else size(subpop.individuals[subpop.individuals.sex =="F"]);
 		femaleReproductiveOutput[subpop.id] = carryingCapacity*maximalAverageFemaleOffspring/(carryingCapacity + maximalAverageFemaleOffspring*femaleCount - subpop.individualCount);
-//		
-//		debug(femaleCount);
-//		print(subpop.individualCount);
-//		print(effectivePopulationSize);
-//		print(femaleReproductiveOutput);
 	}
 }
 
 
-reproduction(NULL, "F") {
+reproduction() {
+	if (sexed)
+		if (individual.sex!="F")
+			return;
+	
 	//steriles dont reproduce
 	if (sterility)
 		if (any(2<=copiesOfMutations(individual, community.allMutationTypes)))
@@ -100,7 +101,7 @@ reproduction(NULL, "F") {
 	//produce offspring
 	growthRate=max(femaleReproductiveOutput[subpop.id],-1.9999999);
 	for (i in seqLen(rpois(1, growthRate))) {
-		mate = subpop.sampleIndividuals(1, sex="M");	
+		mate = sexed ? subpop.sampleIndividuals(1, sex="M") else subpop.sampleIndividuals(1);	
 		if (size(mate)) {
 			subpop.addCrossed(individual, mate);
 		}
@@ -111,8 +112,10 @@ modifyChild() {
 	//lethals die
 	if (sterility)
 		return T;
-	if (child.sex!="F")
-		return T;
+	if (sexed)
+	    if (child.sex!="F")
+			return T;
+		
 	return !any(2<=copiesOfMutations(child, community.allMutationTypes));
 		 
 }
@@ -145,23 +148,23 @@ early() {
 	//end condition 1: population crash
 	if (size(sim.subpopulations[1].individuals) == 0) {
 		cat("EXTINCT\n");
-		if (!exists("slimgui")) {writeOutputData("EXTINCT");}
+		if (!exists("slimgui")) writeOutputData("EXTINCT");
 		sim.simulationFinished();
 	}
 	//end condition 2: survival
 	if (size(sim.subpopulations[1].individuals) >= carryingCapacity) {
 		cat("SURVIVED\n");
-		if (!exists("slimgui")) {writeOutputData("SURVIVED");}
+		if (!exists("slimgui")) writeOutputData("SURVIVED");
 		sim.simulationFinished();
 	}
 	
 }
 
 2000 late() {
-	//end condition 2: long term survival
+	//end condition 3: long term suppression
 	result = "LOADED_SURVIVAL";
 	cat(result+"\n");
-	if (!exists("slimgui")) {writeOutputData(result);}
+	if (!exists("slimgui")) writeOutputData(result);
 	sim.simulationFinished();
 
 }

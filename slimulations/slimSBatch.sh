@@ -1,11 +1,15 @@
 #!/bin/bash
 
 # What file is being run?
-if [ ! -n $1 ]; then
+slurmscript=$(realpath $1)
+if [ ! -n $slurmscript ]; then
 echo "please provide full path to a slurm job script as argument" >&2
 exit 1
 fi
-jobName="$(echo $1 | sed -r "s/.+\/(.+)\..+/\1/")_$(date +%s)"
+situationName="$(echo $slurmscript | sed -r "s/.+\/(.+)\..+/\1/" )"
+modelName="$(dirname $slurmscript | sed 's:.*/::' )"
+jobName="${situationName}_$(modelName | sed 's/[a-z]//g')_$(date +%s)"
+
 
 # Partition for the job:
 sbatchOptions="--partition=cascade"
@@ -63,7 +67,6 @@ outputFile="./data/out_${jobName}.csv"
 echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,RecombinationRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 
 # Runscript
-slurmscript=$1
 workdir=$(dirname $slurmscript)
 cmd="sbatch ${sbatchOptions} --chdir=$workdir $slurmscript"
 echo $cmd
