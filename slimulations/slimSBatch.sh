@@ -8,7 +8,8 @@ exit 1
 fi
 situationName="$(echo $slurmscript | sed -r "s/.+\/(.+)\..+/\1/" )"
 modelName="$(dirname $slurmscript | sed 's:.*/::' )"
-jobName="${situationName}_$(modelName | sed 's/[a-z]//g')_$(date +%s)"
+jobName="${situationName}_$(echo $modelName | sed 's/[a-z]//g')_$(date +%s)"
+projectDir="/home/lnowellnicol/punim2001/DP23-Allee-Drive-Modeling"
 
 
 # Partition for the job:
@@ -34,13 +35,13 @@ sbatchOptions+=" --mail-type=FAIL"
 sbatchOptions+=" --mail-type=END"
 
 # log output files
-sbatchOptions+=" -o ../logs/slurm.$jobName.out" # STDOUT 
-sbatchOptions+=" -e ../logs/slurm.$jobName.err" # STDERR
+sbatchOptions+=" -o $projectDir/logs/slurm.$jobName.out" # STDOUT 
+sbatchOptions+=" -e $projectDir/logs/slurm.$jobName.err" # STDERR
 
 
 # # # File and version checks 
 # Run the job from this directory:
-cd /home/lnowellnicol/punim2001/DP23-Allee-Drive-Modeling
+cd $projectDir
 
 # Check if the bash version is lower than 4.3.0 since we use associative arrays
 if [[ "${BASH_VERSION}" < "4.3.0" ]]; then
@@ -49,7 +50,7 @@ if [[ "${BASH_VERSION}" < "4.3.0" ]]; then
 fi
 
 # check sources
-bcpriSourcePath="../Bash-Command-Parameter-Ranges-Iterator/BashCommandParameterRangesIterator.sh"
+bcpriSourcePath="$projectDir/../Bash-Command-Parameter-Ranges-Iterator/BashCommandParameterRangesIterator.sh"
 if [ ! -f "$bcpriSourcePath" ]; then
     echo "Error: Bash-Command-Parameter-Ranges-Iterator not found please download from https://github.com/4321louis/Bash-Command-Parameter-Ranges-Iterator and edit this script to point to it"
     exit 1
@@ -63,7 +64,7 @@ source $bcpriSourcePath
 
 
 # Write csv header
-outputFile="./data/out_${jobName}.csv"
+outputFile="$projectDir/data/out_${jobName}.csv"
 echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,RecombinationRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 
 # Runscript
