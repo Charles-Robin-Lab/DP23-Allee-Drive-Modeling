@@ -68,8 +68,7 @@ outputFile="$projectDir/data/out_${jobName}.csv"
 echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,RecombinationRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 
 # Runscript
-workdir=$(dirname $slurmscript)
-cmd="sbatch ${sbatchOptions} --chdir=$workdir $slurmscript"
+cmd="sbatch ${sbatchOptions} --chdir=$projectDir --export=outputFile=$outputFile $slurmscript"
 echo $cmd
 $cmd
 
