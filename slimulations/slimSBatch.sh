@@ -19,7 +19,7 @@ sbatchOptions="--partition=cascade"
 sbatchOptions+=" --nodes=1"
 
 # The project ID which this job should run under:
-sbatchOptions+=" --account=\"punim2001\""
+sbatchOptions+=" --account=punim2001"
 
 # Maximum number of tasks/CPU cores used by the job:
 sbatchOptions+=" --ntasks=1"
@@ -57,19 +57,16 @@ if [ ! -f "$bcpriSourcePath" ]; then
 fi
 sbatchOptions+=" --export=bcpriSourcePath=$bcpriSourcePath" 
 
-# # # run job code
-
-# Source files
-module load SLiM/4.0.1
-
-
 # Write csv header
 outputFile="$projectDir/data/out_${jobName}.csv"
-echo "Seed,Result,Time,MutationFrequency,MutationCount,GrowthRate,RecombinationRate,Individuals,Males,Sterile,Xlinked" >> "$outputFile"
 sbatchOptions+=" --export=outputFile=$outputFile" 
+
+# Run model setup
+$(dirname $slurmscript)/setupHPC.sh $outputFile
 
 # Runscript
 cmd="sbatch ${sbatchOptions} --chdir=$projectDir $slurmscript"
+echo Running Job:$jobName with command:
 echo $cmd
 $cmd
 
