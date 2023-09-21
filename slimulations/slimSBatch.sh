@@ -55,11 +55,10 @@ if [ ! -f "$bcpriSourcePath" ]; then
     echo "Error: Bash-Command-Parameter-Ranges-Iterator not found please download from https://github.com/4321louis/Bash-Command-Parameter-Ranges-Iterator and edit this script to point to it"
     exit 1
 fi
-sbatchOptions+=" --export=bcpriSourcePath=$bcpriSourcePath" 
 
 # Write csv header
 outputFile="$projectDir/data/out_${jobName}.csv"
-sbatchOptions+=" --export=outputFile=$outputFile" 
+sbatchOptions+=" --export=outputFile=$outputFile,bcpriSourcePath=$bcpriSourcePath" 
 
 # Run model setup
 $(dirname $slurmscript)/setupHPC.sh $outputFile

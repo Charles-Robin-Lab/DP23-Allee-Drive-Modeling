@@ -9,6 +9,7 @@
 #SBATCH --array=1-1200
 
 # Source files
+module load GCC/11.3.0
 module load SLiM/4.0.1
 source $bcpriSourcePath
 # full
