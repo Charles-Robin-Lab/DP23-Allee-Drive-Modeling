@@ -26,7 +26,7 @@ declare -A paramRanges=(
   ["recombinationRate"]="1e-3 1.77827941e-3 3.16227766e-3 5.62341325e-3 1e-4 1.77827941e-4 3.16227766e-4 5.62341325e-4 1e-5 1.77827941e-5 3.16227766e-5 5.62341325e-5 1e-6 1.77827941e-6 3.16227766e-6 5.62341325e-6 1e-7 1.77827941e-7 3.16227766e-7 5.62341325e-7 1e-8 1.77827941e-8 3.16227766e-8 5.62341325e-8 1e-9 1e-10 1e-11 1e-12 1e-13 1e-14 1e-15 0"
 )
 
-runOverRanges "slim -d outputFilePath='$outputFile' %s slimulations/LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 
 ##DO NOT ADD/EDIT BEYOND THIS LINE##
 ##Job monitor command to list the resource usage

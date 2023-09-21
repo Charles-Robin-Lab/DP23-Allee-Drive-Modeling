@@ -43,7 +43,7 @@ declare -A paramRanges=(
   ["sterility"]=$(seq 0 1 1)
 )
 
-runOverRanges "slim -d outputFilePath='$outputFile' %s slimulations/LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]=4.0
   ["migrantsSize"]=$(seq 2 1 120)
@@ -52,7 +52,7 @@ declare -A paramRanges=(
   ["sterility"]=$(seq 0 1 1)
 )
 
-runOverRanges "slim -d outputFilePath='$outputFile' %s slimulations/LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]=4.0
   ["migrantsSize"]=20
@@ -61,7 +61,7 @@ declare -A paramRanges=(
   ["sterility"]=$(seq 0 1 1)
 )
 
-runOverRanges "slim -d outputFilePath='$outputFile' %s slimulations/LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]=4.0
   ["migrantsSize"]=20
@@ -70,7 +70,7 @@ declare -A paramRanges=(
   ["sterility"]=$(seq 0 1 1)
 )
 
-runOverRanges "slim -d outputFilePath='$outputFile' %s slimulations/LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 
 ##DO NOT ADD/EDIT BEYOND THIS LINE##
 ##Job monitor command to list the resource usage

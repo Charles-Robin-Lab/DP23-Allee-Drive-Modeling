@@ -65,7 +65,7 @@ sbatchOptions+=" --export=outputFile=$outputFile"
 $(dirname $slurmscript)/setupHPC.sh $outputFile
 
 # Runscript
-cmd="sbatch ${sbatchOptions} --chdir=$projectDir $slurmscript"
+cmd="sbatch ${sbatchOptions} --chdir=$(dirname $slurmscript) $slurmscript"
 echo Running Job: $jobName for model $modelName with command:
 echo $cmd
 $cmd

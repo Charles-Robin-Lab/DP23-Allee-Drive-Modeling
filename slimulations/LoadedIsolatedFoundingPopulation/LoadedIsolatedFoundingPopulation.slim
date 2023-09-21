@@ -2,7 +2,7 @@ initialize() {
 	// setSeed(2073423208520);
 	setSeed(rdunif(1, 0, asInteger(2^62) - 1));
 	initializeSLiMModelType("nonWF");
-	defineConstantIfNotExist("sexed",F);
+	defineConstantIfNotExist("sexed",T);
 	defineConstantIfNotExist("mutsFrequency",0.015);
 	defineConstantIfNotExist("mutsCount",400);
 	defineConstantIfNotExist("mutsHetFitnessDiff",0.000);
@@ -16,7 +16,7 @@ initialize() {
 	defineConstantIfNotExist("outputFilePath","../data/out1.csv");
 	defineConstantIfNotExist("recombinationRate",2.12e-8);
 //	WARNING: spacing between mutations undefined if mutations % chromosomeCount != 0
-	defineConstantIfNotExist("chromosomeCount",4);
+	defineConstantIfNotExist("chromosomeCount",1);
 	defineGlobal("femaleReproductiveOutput", c(0.0,0.0));
 	
 	initializeMutationRate(0.0);
