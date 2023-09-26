@@ -38,7 +38,6 @@ while (N>0 && N<0.5*carryingCapacity) {
 # - variance in reproductive output (poisson of lambda)
 # - genetic drift (allele frequency)
 # - HW drift (genotype frequency)
-# - binomial sexing
 
 
 # t=0
