@@ -5,8 +5,8 @@ PMFHomozygotes <- function(N,NMutallele,NHomo) {
     NWTallele <- 2*N-NMutallele
     Nhetero <- NMutallele - 2*NHomo
     NWT<-N-NMutallele+NHomo
-    # From Rohlis & Weir 2008
-    (factorial(N)/factorial(NHomo)/factorial(Nhetero)/factorial(NWT)) * 2^Nhetero * factorial(NWTallele)* factorial(NMutallele)/factorial(2*N)
+    # From Rohlfs & Weir 2008
+    exp(lfactorial(N)-lfactorial(NHomo)-lfactorial(Nhetero)-lfactorial(NWT) + lfactorial(NWTallele)-lfactorial(NMutallele)-lfactorial(2*N)) * 2^Nhetero
 }
 rHomozygotes <- function(N,Nmuts) {
     # https://stackoverflow.com/questions/42941091/sample-from-custom-distribution-in-r
@@ -27,7 +27,7 @@ rHomozygotes <- function(N,Nmuts) {
         }
         if (i>N*2) {
             # print("Error! too much growth")
-            i<-round((Nmuts/(2*N))^2)
+            i<-round(N*(Nmuts/(2*N))^2)
             break
         }
     }
@@ -37,7 +37,7 @@ rHomozygotes <- function(N,Nmuts) {
 PMFGeneDrift <- function(freq,N,mutCount) {
     # Wright-Fisher Model
     # I have assumed that changing popsize doesn't affect this formula
-    factorial(2*N)/factorial(mutCount)/factorial(2*N-mutCount)*freq^mutCount*(1-freq)^(2*N-mutCount)
+    exp(lfactorial(2*N)-lfactorial(mutCount)-lfactorial(2*N-mutCount))*freq^mutCount*(1-freq)^(2*N-mutCount)
 }
 rGeneDrift <- function(Nmuts,prevN,nextN) {
     r <- runif(1,0,1)
@@ -173,33 +173,43 @@ extendedSimRecurse2 <- function(loci, p, Ne, birthRate, carryingCapacity, nSampl
 
 # some example parameters...
 loci <- 100 # number of loci
-freqRange <- seq(0, 0.3, by = 0.0025) # mean frequency in ancestral population
+freqRange <- seq(0.0, 0.3, by = 0.0025) # mean frequency in ancestral population
 Ne <- 25
 birthRate <- 3.0
 carryingCapacity <- 1000
-survival <- list()
+survivalW <- list()
+for (averageMutFreq in freqRange) {
+    mutFreqs <- rep(averageMutFreq,loci)
+    fitnessDecreases <- W(loci, mutFreqs, Ne)
+    survivalW <- append(survivalW, length(fitnessDecreases[fitnessDecreases > 1 / birthRate]) / length(fitnessDecreases))
+}
+par(new=TRUE)
+plot(freqRange, survivalW,col="red",ylim=c(0,1),pch=2,xlab="",ylab="")
+
+survivalSingle <- list()
 for (averageMutFreq in freqRange) {
     fitnessDecreases <- extendedSim(loci, averageMutFreq, Ne)/Ne
-    # fitnessDecreases <- W(loci, mutFreqs, Ne)
-    survival <- append(survival, length(fitnessDecreases[fitnessDecreases > 1 / birthRate]) / length(fitnessDecreases))
+    survivalSingle <- append(survivalSingle, length(fitnessDecreases[fitnessDecreases > 1 / birthRate]) / length(fitnessDecreases))
 }
-plot(freqRange, survival,col="red")
+par(new=TRUE)
+plot(freqRange, survival,col="green",ylim=c(0,1),pch=2,xlab="",ylab="")
 
-survival2 <- list()
+survivalRecurse <- list()
 for (averageMutFreq in freqRange) {
-    outcomeGroup2 <- extendedSimRecurse2(loci, averageMutFreq, Ne, birthRate, carryingCapacity)
+    outcomeGroup <- extendedSimRecurse2(loci, averageMutFreq, Ne, birthRate, carryingCapacity)
     # fitnessDecreases <- W(loci, mutFreqs, Ne)
-    survival2 <- append(survival2, length(outcomeGroup2[outcomeGroup2 != "EXTINCT"]) / length(outcomeGroup2))
+    survivalRecurse <- append(survivalRecurse, length(outcomeGroup[outcomeGroup != "EXTINCT"]) / length(outcomeGroup))
 }
 
 par(new=TRUE)
-plot(freqRange, survival2,col="green")
+plot(head(freqRange,length(survivalRecurse)), survivalRecurse,col="blue",ylim=c(0,1),xlim=c(0,0.3),pch=0,xlab="",ylab="")
 
 
 # Pulling slim apart:
 # a- initial sampling bias
-# x- binomial sexing
+# s- binomial sexing
 # a- lethality
 # a- variance in reproductive output (poisson of lambda)
 # a- genetic drift (allele frequency)
 # a- HW drift (genotype frequency)
+# x- Distribution of alleles within individuals
