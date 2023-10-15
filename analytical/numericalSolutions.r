@@ -56,7 +56,7 @@ rGeneDrift <- function(Nmuts,prevN,nextN) {
         }
         if (i>nextN*2) {
             # print("Error! too much growth")
-            i<-Nmuts
+            i<-round(Nmuts/prevN*nextN)
             break
         }
     }

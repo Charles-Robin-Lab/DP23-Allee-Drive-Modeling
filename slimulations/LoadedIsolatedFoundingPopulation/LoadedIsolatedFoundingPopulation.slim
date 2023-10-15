@@ -3,6 +3,7 @@ initialize() {
 	setSeed(rdunif(1, 0, asInteger(2^62) - 1));
 	initializeSLiMModelType("nonWF");
 	defineConstantIfNotExist("sexed",T);
+	defineConstantIfNotExist("femaleOnlyEffect",T);
 	defineConstantIfNotExist("mutsFrequency",0.015);
 	defineConstantIfNotExist("mutsCount",400);
 	defineConstantIfNotExist("mutsHetFitnessDiff",0.000);
@@ -15,7 +16,7 @@ initialize() {
 	defineConstantIfNotExist("carryingCapacity",1000);
 	defineConstantIfNotExist("outputFilePath","../data/out1.csv");
 	defineConstantIfNotExist("recombinationRate",2.12e-8);
-//	WARNING: spacing between mutations undefined if mutations % chromosomeCount != 0
+//	WARNING: spacing between mutations untested if mutations % chromosomeCount != 0
 	defineConstantIfNotExist("chromosomeCount",1);
 	defineGlobal("femaleReproductiveOutput", c(0.0,0.0));
 	
@@ -91,8 +92,9 @@ first() {
 
 reproduction() {
 	if (sexed)
-		if (individual.sex!="F")
-			return;
+		if (femaleOnlyEffect)
+			if (individual.sex!="F")
+				return;
 	
 	//steriles dont reproduce
 	if (sterility)
@@ -113,8 +115,9 @@ modifyChild() {
 	if (sterility)
 		return T;
 	if (sexed)
-	    if (child.sex!="F")
-			return T;
+		if (femaleOnlyEffect)
+   		if (child.sex!="F")
+				return T;
 		
 	return !any(2<=copiesOfMutations(child, community.allMutationTypes));
 		 
