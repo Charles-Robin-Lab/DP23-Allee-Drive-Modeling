@@ -4,15 +4,15 @@ initialize() {
 	initializeSLiMModelType("nonWF");
 	defineConstantIfNotExist("sexed",T);
 	defineConstantIfNotExist("femaleOnlyEffect",T);
-	defineConstantIfNotExist("mutsFrequency",0.015);
-	defineConstantIfNotExist("mutsCount",400);
+	defineConstantIfNotExist("mutsFrequency",0.05);
+	defineConstantIfNotExist("mutsCount",100);
 	defineConstantIfNotExist("mutsHetFitnessDiff",0.000);
 	defineConstantIfNotExist("homozygousSterilityChance",1.0);
 	defineConstantIfNotExist("genomeSize",100e+6);
 	defineConstantIfNotExist("migrantsSize",25);
 	defineConstantIfNotExist("sterility",F);
 	defineConstantIfNotExist("xlinked",F);
-	defineConstantIfNotExist("maximalAverageFemaleOffspring",3.0);
+	defineConstantIfNotExist("maximalAverageFemaleOffspring",2.0);
 	defineConstantIfNotExist("carryingCapacity",1000);
 	defineConstantIfNotExist("outputFilePath","../data/out1.csv");
 	defineConstantIfNotExist("recombinationRate",2.12e-8);
@@ -92,9 +92,8 @@ first() {
 
 reproduction() {
 	if (sexed)
-		if (femaleOnlyEffect)
-			if (individual.sex!="F")
-				return;
+		if (individual.sex!="F")
+			return;
 	
 	//steriles dont reproduce
 	if (sterility)
@@ -105,13 +104,19 @@ reproduction() {
 	for (i in seqLen(rpois(1, growthRate))) {
 		mate = sexed ? subpop.sampleIndividuals(1, sex="M") else subpop.sampleIndividuals(1);	
 		if (size(mate)) {
+			//sterile males dont reproduce
+			if (!femaleOnlyEffect)
+				if (sterility)
+					if (any(2<=copiesOfMutations(mate, community.allMutationTypes)))
+						next;
+			
 			subpop.addCrossed(individual, mate);
 		}
 	}
 }
 
 modifyChild() {
-	//lethals die
+	////lethals die
 	if (sterility)
 		return T;
 	if (sexed)
