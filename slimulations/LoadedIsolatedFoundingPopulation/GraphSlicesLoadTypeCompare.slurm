@@ -41,6 +41,7 @@ declare -A paramRanges=(
   ["migrantsSize"]=20
   ["mutsFrequency"]=0.1
   ["mutsCount"]=60
+  ["xlinked"]=0
   ["femaleOnlyEffect"]=$(seq 0 1 1)
   ["sterility"]=$(seq 0 1 1)
 )
@@ -51,6 +52,7 @@ declare -A paramRanges=(
   ["migrantsSize"]=$(seq 2 1 120)
   ["mutsFrequency"]=0.1
   ["mutsCount"]=60
+  ["xlinked"]=0
   ["femaleOnlyEffect"]=$(seq 0 1 1)
   ["sterility"]=$(seq 0 1 1)
 )
@@ -61,6 +63,7 @@ declare -A paramRanges=(
   ["migrantsSize"]=20
   ["mutsFrequency"]=$(seq 0.04 0.002 0.15)
   ["mutsCount"]=60
+  ["xlinked"]=0
   ["femaleOnlyEffect"]=$(seq 0 1 1)
   ["sterility"]=$(seq 0 1 1)
 )
@@ -71,6 +74,7 @@ declare -A paramRanges=(
   ["migrantsSize"]=20
   ["mutsFrequency"]=0.1
   ["mutsCount"]=$(seq 1 1 120)
+  ["xlinked"]=0
   ["femaleOnlyEffect"]=$(seq 0 1 1)
   ["sterility"]=$(seq 0 1 1)
 )
