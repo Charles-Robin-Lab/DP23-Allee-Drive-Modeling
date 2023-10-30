@@ -4,20 +4,22 @@ initialize() {
 	initializeSLiMModelType("nonWF");
 	defineConstantIfNotExist("sexed",T);
 	defineConstantIfNotExist("femaleOnlyEffect",T);
-	defineConstantIfNotExist("mutsFrequency",0.05);
-	defineConstantIfNotExist("mutsCount",100);
+	defineConstantIfNotExist("mutsFrequency",0.1);
+	defineConstantIfNotExist("mutsCount",16);
 	defineConstantIfNotExist("mutsHetFitnessDiff",0.000);
 	defineConstantIfNotExist("homozygousSterilityChance",1.0);
 	defineConstantIfNotExist("genomeSize",100e+6);
 	defineConstantIfNotExist("migrantsSize",25);
 	defineConstantIfNotExist("sterility",F);
 	defineConstantIfNotExist("xlinked",F);
-	defineConstantIfNotExist("maximalAverageFemaleOffspring",2.0);
+	defineConstantIfNotExist("maximalAverageFemaleOffspring",2.2);
 	defineConstantIfNotExist("carryingCapacity",1000);
 	defineConstantIfNotExist("outputFilePath","../data/out1.csv");
 	defineConstantIfNotExist("recombinationRate",2.12e-8);
-//	WARNING: spacing between mutations untested if mutations % chromosomeCount != 0
+	//	WARNING: spacing between mutations untested if mutations % chromosomeCount != 0
 	defineConstantIfNotExist("chromosomeCount",1);
+	// WARNING: max is 10,000 without further edits
+	defineConstantIfNotExist("maxGenerations",100);
 	defineGlobal("femaleReproductiveOutput", c(0.0,0.0));
 	
 	initializeMutationRate(0.0);
@@ -152,23 +154,33 @@ early() {
 	sim.killIndividuals(inds[inds.age >= 1]);
 }
 
-1:1999 late() {
+1:9999 late() {
 	//end condition 1: population crash
 	if (size(sim.subpopulations[1].individuals) == 0) {
 		cat("EXTINCT\n");
 		if (!exists("slimgui")) writeOutputData("EXTINCT");
 		sim.simulationFinished();
+		return;
 	}
 	//end condition 2: survival
 	if (size(sim.subpopulations[1].individuals) >= carryingCapacity) {
 		cat("SURVIVED\n");
 		if (!exists("slimgui")) writeOutputData("SURVIVED");
 		sim.simulationFinished();
+		return;
+	}
+	//end condition 3: long term suppression
+	if (sim.cycle>maxGenerations){
+		result = "LOADED_SURVIVAL";
+		cat(result+"\n");
+		if (!exists("slimgui")) writeOutputData(result);
+		sim.simulationFinished();
+		return;
 	}
 	
 }
 
-2000 late() {
+10000 late() {
 	//end condition 3: long term suppression
 	result = "LOADED_SURVIVAL";
 	cat(result+"\n");
@@ -182,12 +194,13 @@ function (void)writeOutputData(string result) {
 		asString(getSeed())+","+ 
 		asString(result)+","+
 		asString(sim.cycle)+","+
-		asString(mutsFrequency)+","+
-		asString(mutsCount)+","+
+		asString(foundingMalesCount)+","+
+		asString(migrantsSize)+","+
 		asString(maximalAverageFemaleOffspring)+","+
 		asString(recombinationRate)+","+
-		asString(migrantsSize)+","+
-		asString(foundingMalesCount)+","+
+		asString(maxGenerations)+","+
+		asString(mutsFrequency)+","+
+		asString(mutsCount)+","+
 		asString(sterility)+","+
 		asString(xlinked)+","+
 		asString(femaleOnlyEffect)
