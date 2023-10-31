@@ -28,7 +28,7 @@ declare -A paramRanges=(
   ["femaleOnlyEffect"]=1
   ["chromosomeCount"]=3
   ["maxGenerations"]="5 10 100 2000"
-  ["recombinationRate"]=${RR[{$SLURM_ARRAY_TASK_ID} % 16]}
+  ["recombinationRate"]=${RR[$SLURM_ARRAY_TASK_ID % 16]}
 )
 
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
