@@ -32,7 +32,7 @@ declare -A paramRanges=(
   ["recombinationRate"]="2.32e-8 4.22e-8"
 )
 
-runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedLabPopulation.slim" "-d" paramRanges
 
 ##DO NOT ADD/EDIT BEYOND THIS LINE##
 ##Job monitor command to list the resource usage
