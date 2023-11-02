@@ -16,7 +16,7 @@ module load GCC/11.3.0
 module load SLiM/4.0.1
 source $bcpriSourcePath
 #50*(4+4)*5*6*7*4*16 
-RR=('1e-5' '2.32e-8' '4.22e-8' '1e-8' '1.77827941e-8' '3.16227766e-8' '5.62341325e-8' '1e-9' '1.77827941e-9' '3.16227766e-9' '5.62341325e-9' '1e-10' '1.77827941e-10' '3.16227766e-10' '5.62341325e-10' '1e-11')
+RR=('0' '1e-5' '2.32e-8' '4.22e-8' '1e-8' 1e-12)
 
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]=$(seq 2 1 5; seq 10 10 40)

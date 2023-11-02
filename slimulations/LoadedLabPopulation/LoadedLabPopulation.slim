@@ -3,21 +3,24 @@ initialize() {
 	setSeed(rdunif(1, 0, asInteger(2^62) - 1));
 	initializeSLiMModelType("nonWF");
 	defineConstantIfNotExist("sexed",T);
-	defineConstantIfNotExist("femaleOnlyEffect",T);
-	defineConstantIfNotExist("mutsFrequency",0.1);
-	defineConstantIfNotExist("mutsCount",16);
+	defineConstantIfNotExist("femaleOnlyEffect",F);
+	defineConstantIfNotExist("mutsFrequency",0.05);
+	defineConstantIfNotExist("mutsCount",40);
 	defineConstantIfNotExist("mutsHetFitnessDiff",0.000);
 	defineConstantIfNotExist("homozygousSterilityChance",1.0);
-	defineConstantIfNotExist("genomeSize",100e+6);
-	defineConstantIfNotExist("migrantsSize",25);
+	defineConstantIfNotExist("genomeSize",40);
+	defineConstantIfNotExist("migrantsSize",10);
 	defineConstantIfNotExist("sterility",F);
 	defineConstantIfNotExist("xlinked",F);
+	// WARNING: undefined for subpopsSexEvenlyDistributed=F && subpopsMutationsEvenlyDistributed=T
+	defineConstantIfNotExist("subpopsMutationsEvenlyDistributed",T);
+	defineConstantIfNotExist("subpopsSexEvenlyDistributed",T);
 	defineConstantIfNotExist("maximalAverageFemaleOffspring",2.2);
 	defineConstantIfNotExist("carryingCapacity",1000);
 	defineConstantIfNotExist("outputFilePath","../data/out1.csv");
 	defineConstantIfNotExist("recombinationRate",2.12e-8);
 	//	WARNING: spacing between mutations untested if mutations % chromosomeCount != 0
-	defineConstantIfNotExist("chromosomeCount",1);
+	defineConstantIfNotExist("chromosomeCount",2);
 	// WARNING: max is 10,000 without further edits
 	defineConstantIfNotExist("maxGenerations",100);
 	defineGlobal("femaleReproductiveOutput", c(0.0,0.0));
@@ -26,12 +29,12 @@ initialize() {
 	initializeMutationType("m0", 0.5, "f", 0.0);
 	initializeGenomicElementType("g0", m0, 1.0);
 	initializeGenomicElement(g0, 0, genomeSize-1);
-	rates = c(recombinationRate, rep(c(0.5,recombinationRate),chromosomeCount-1));
+	// setup chromosomes
+	rates = c(0.5, recombinationRate, rep(c(0.5,recombinationRate),chromosomeCount-1));
 	ends = integer(0);
-	for (i in seqLen(max(chromosomeCount-1,0))+1) {
-		ends = c(ends,asInteger(genomeSize*(i)/chromosomeCount-1),asInteger(genomeSize*(i)/chromosomeCount));
+	for (i in seqLen(max(chromosomeCount,0))) {
+		ends = c(ends,chromosomePosition(i));
 	}
-	ends =  c(ends,genomeSize-1);
 	initializeRecombinationRate(rates, ends);
 	if (sexed) {
 		initializeSex(xlinked ? "X" else "A");
@@ -42,6 +45,15 @@ initialize() {
 		mut = initializeMutationType("m"+asString(i) , 1.0, "f", mutsHetFitnessDiff);
 		mut.color = "green"; 
 	}
+	//debug colours
+	mut = initializeMutationType("m"+asString(mutsCount+1) , 1.0, "f", mutsHetFitnessDiff);
+	mut.color = "red"; 
+	mut = initializeMutationType("m"+asString(mutsCount+2) , 1.0, "f", mutsHetFitnessDiff);
+	mut.color = "blue"; 
+}
+
+function (integer)chromosomePosition(integer$ chromosome) {
+	return c(asInteger(genomeSize*chromosome/chromosomeCount), asInteger(genomeSize*(chromosome+1)/chromosomeCount)-1);
 }
 
 function (void)defineConstantIfNotExist(string$ symbol, * value) {
@@ -51,30 +63,76 @@ function (void)defineConstantIfNotExist(string$ symbol, * value) {
 }
 
 1 early() {
-	sim.addSubpop(0, carryingCapacity);
-	sim.addSubpop(1, 0);
+	if (subpopsMutationsEvenlyDistributed) {
+		sim.addSubpop(0, 0);
+		sim.addSubpop(1, migrantsSize);
+		//stats
+		defineConstant("foundingMalesCount",sum(sim.subpopulations[1].individuals.sex=="M"));
+	}
+	else {
+		sim.addSubpop(0, carryingCapacity);
+		sim.addSubpop(1, 0);
+	}
 }
 
 1 late() {
 	// add mutations
 	muts = community.allMutationTypes;
-	possibleCarrierChromosomes = sim.subpopulations.individuals.genomes[!(sim.subpopulations.individuals.genomes.isNullGenome)];
-	for (i in seqLen(mutsCount)+1) {
-		sample(
-			possibleCarrierChromosomes, 
-			asInteger(mutsFrequency*size(possibleCarrierChromosomes))
-		).addNewDrawnMutation(muts[i], asInteger(genomeSize*(i-1)/mutsCount));
+	inds = sim.subpopulations.individuals;
+	possibleCarrierGenome1s = inds.genome1[!(inds.genome1.isNullGenome)];
+	possibleCarrierGenome2s = inds.genome2[!(inds.genome2.isNullGenome)];
+	possibleCarrierGenomes = c(possibleCarrierGenome1s,possibleCarrierGenome2s);
+	//debug markers
+	possibleCarrierGenome1s.addNewDrawnMutation(muts[mutsCount+1], 1);
+	possibleCarrierGenome2s.addNewDrawnMutation(muts[mutsCount+2], 2);
+	if (subpopsMutationsEvenlyDistributed) { 
+		chromosomeI = -1;
+		genomeI = 0;
+		mutsPerChromosome = mutsCount/chromosomeCount;
 	}
-	// create founder population
-	if (size(sim.subpopulations[0].individuals) > migrantsSize) {
-		migrants = sample(sim.subpopulations[0].individuals, migrantsSize);
-		sim.subpopulations[1].takeMigrants(migrants);
+	for (i in seqLen(mutsCount)) {
+		if (subpopsMutationsEvenlyDistributed) {
+			if ((i % (mutsPerChromosome/2))==0) {
+				chromosomeI = chromosomeI + 1;
+			}
+			if (chromosomeI >= chromosomeCount) {
+				chromosomeI = 0;
+				genomeI = (genomeI + 1) % 2;
+			}
+			chromosomePos = chromosomePosition(chromosomeI);
+			sampledGenomes = (genomeI == 1 ? possibleCarrierGenome1s else possibleCarrierGenome2s)[((i)*asInteger(size(inds)*mutsFrequency*2) % size(inds)):(((i+1)*asInteger(size(inds)*mutsFrequency*2)-1) % size(inds))];
+			print(asInteger((chromosomePos[1]-chromosomePos[0])*(((i%mutsPerChromosome)/(mutsPerChromosome-1)))+chromosomePos[0]));
+			sampledGenomes.addNewDrawnMutation(muts[i+1], asInteger((chromosomePos[1]-chromosomePos[0])*((((2*i+genomeI)%mutsPerChromosome)/(mutsPerChromosome-1)))+chromosomePos[0]));
+		}
+		else { 
+			sample(
+				possibleCarrierGenomes, 
+				asInteger(mutsFrequency*size(possibleCarrierGenomes))
+			).addNewDrawnMutation(muts[i+1], asInteger(genomeSize*(i)/mutsCount));
+		}
 	}
-	// kill core since no longer needed
-	sim.killIndividuals(sim.subpopulations[0].individuals);
+	if (!subpopsMutationsEvenlyDistributed) {
+		
+		// create founder population
+		if (size(sim.subpopulations[0].individuals) > migrantsSize) {
+			if (subpopsSexEvenlyDistributed) {
+				inds = sim.subpopulations[0].individuals;
+				males = asInteger(floor(migrantsSize/2));
+				migrants = sample(inds[inds.sex=="M"], males);
+				migrants = c(migrants,sample(inds[inds.sex=="F"], migrantsSize-males));
+			}
+			else {
+				migrants = sample(sim.subpopulations[0].individuals, migrantsSize);
+			}
+			sim.subpopulations[1].takeMigrants(migrants);
+		}
+		// kill core since no longer needed
+		sim.killIndividuals(sim.subpopulations[0].individuals);
+		//stats
+		defineConstant("foundingMalesCount",sum(migrants.sex=="M"));
+	}
+//	print(inds[1].genome1.)
 	
-	//stats
-	defineConstant("foundingMalesCount",sum(migrants.sex=="M"));
 }
 
 first() {
