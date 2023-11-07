@@ -17,7 +17,7 @@ module load SLiM/4.0.1
 source $bcpriSourcePath
 
 declare -A paramRanges=(
-  ["maximalAverageFemaleOffspring"]=3.0
+  ["maximalAverageFemaleOffspring"]=$(seq 2 1 5; seq 10 10 40)
   ["migrantsSize"]="2 6 10"
   ["mutsFrequency"]=0.5
   ["mutsCount"]=2
@@ -56,7 +56,7 @@ runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedLabPopulation.slim"
 
 
 declare -A paramRanges=(
-  ["maximalAverageFemaleOffspring"]=3.0
+  ["maximalAverageFemaleOffspring"]=$(seq 2 1 5; seq 10 10 40)
   ["migrantsSize"]="2 6 10"
   ["mutsFrequency"]=0.33
   ["mutsCount"]=3
@@ -95,7 +95,7 @@ runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedLabPopulation.slim"
 
 
 declare -A paramRanges=(
-  ["maximalAverageFemaleOffspring"]=3.0
+  ["maximalAverageFemaleOffspring"]=$(seq 2 1 5; seq 10 10 40)
   ["migrantsSize"]="2 6 10"
   ["mutsFrequency"]=0.25
   ["mutsCount"]=4
@@ -133,7 +133,7 @@ declare -A paramRanges=(
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedLabPopulation.slim" "-d" paramRanges
 
 declare -A paramRanges=(
-  ["maximalAverageFemaleOffspring"]=3.0
+  ["maximalAverageFemaleOffspring"]=$(seq 2 1 5; seq 10 10 40)
   ["migrantsSize"]="2 6 10"
   ["mutsFrequency"]=0.2
   ["mutsCount"]=5
