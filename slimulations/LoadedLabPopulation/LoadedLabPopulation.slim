@@ -113,7 +113,7 @@ function (void)defineConstantIfNotExist(string$ symbol, * value) {
 				// we are sampling a bit of each chromosome in the pair, doesn't matter in the scheme of things...
 				sampledGenomes = (genomeI == 1 ? 
 					c(possibleCarrierGenome1s[startSample:(size(possibleCarrierGenome1s)-1)],possibleCarrierGenome2s[0:endSample]) else 
-					c(possibleCarrierGenome2s[startSample:(size(possibleCarrierGenome2s)-1)],possibleCarrierGenome1s[0:endSample])
+					c(possibleCarrierGenome2s[startSample:(size(possibleCarrierGenome2s)-1)],possibleCarrierGenome1s[0:endSample]));
 				genomeI = (genomeI + 1) % 2;
 			
 			}
