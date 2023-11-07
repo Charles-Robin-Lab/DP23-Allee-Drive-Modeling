@@ -100,9 +100,25 @@ function (void)defineConstantIfNotExist(string$ symbol, * value) {
 				genomeI = (genomeI + 1) % 2;
 			}
 			chromosomePos = chromosomePosition(chromosomeI);
-			sampledGenomes = (genomeI == 1 ? possibleCarrierGenome1s else possibleCarrierGenome2s)[((i)*asInteger(size(inds)*mutsFrequency*2) % size(inds)):(((i+1)*asInteger(size(inds)*mutsFrequency*2)-1) % size(inds))];
-			print(asInteger((chromosomePos[1]-chromosomePos[0])*(((i%mutsPerChromosome)/(mutsPerChromosome-1)))+chromosomePos[0]));
-			sampledGenomes.addNewDrawnMutation(muts[i+1], asInteger((chromosomePos[1]-chromosomePos[0])*((((2*i+genomeI)%mutsPerChromosome)/(mutsPerChromosome-1)))+chromosomePos[0]));
+			genomesNeeded =asInteger(size(inds)*mutsFrequency*2);
+			startSample =((i)*genomesNeeded % size(inds));
+			endSample = (((i+1)*genomesNeeded -1) % size(inds));
+			print("a");
+			print(startSample);
+			print(endSample);
+			
+			if (startSample < endSample){
+				sampledGenomes = (genomeI == 1 ? possibleCarrierGenome1s else possibleCarrierGenome2s)[startSample:endSample];
+			} else {
+				// we are sampling a bit of each chromosome in the pair, doesn't matter in the scheme of things...
+				sampledGenomes = (genomeI == 1 ? 
+					c(possibleCarrierGenome1s[startSample:(size(possibleCarrierGenome1s)-1)],possibleCarrierGenome2s[0:endSample]) else 
+					c(possibleCarrierGenome2s[startSample:(size(possibleCarrierGenome2s)-1)],possibleCarrierGenome1s[0:endSample])
+				genomeI = (genomeI + 1) % 2;
+			
+			}
+//			print(asInteger((chromosomePos[1]-chromosomePos[0])*(((i%mutsPerChromosome)/(max(mutsPerChromosome-1,1.0))))+chromosomePos[0]));
+			sampledGenomes.addNewDrawnMutation(muts[i+1], asInteger((chromosomePos[1]-chromosomePos[0])*((((2*i+genomeI)%mutsPerChromosome)/max(mutsPerChromosome-1,1.0)))+chromosomePos[0]));
 		}
 		else { 
 			sample(
@@ -156,7 +172,7 @@ reproduction() {
 	
 	//steriles dont reproduce
 	if (sterility)
-		if (any(2<=copiesOfMutations(individual, community.allMutationTypes)))
+		if (any(2<=copiesOfMutations(individual, community.allMutationTypes[1:mutsCount])))
 			return;
 	//produce offspring
 	growthRate=max(femaleReproductiveOutput[subpop.id],-1.9999999);
@@ -166,7 +182,7 @@ reproduction() {
 			//sterile males dont reproduce
 			if (!femaleOnlyEffect)
 				if (sterility)
-					if (any(2<=copiesOfMutations(mate, community.allMutationTypes)))
+					if (any(2<=copiesOfMutations(mate, community.allMutationTypes[1:mutsCount])))
 						next;
 			
 			subpop.addCrossed(individual, mate);
@@ -183,7 +199,7 @@ modifyChild() {
    		if (child.sex!="F")
 				return T;
 		
-	return !any(2<=copiesOfMutations(child, community.allMutationTypes));
+	return !any(2<=copiesOfMutations(child, community.allMutationTypes[1:mutsCount]));
 		 
 }
 
