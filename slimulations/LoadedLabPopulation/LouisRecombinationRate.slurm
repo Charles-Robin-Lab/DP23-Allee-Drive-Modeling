@@ -16,6 +16,7 @@ module load GCC/11.3.0
 module load SLiM/4.0.1
 source $bcpriSourcePath
 
+# (4+4)*3*2*5*6*800
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]=$(seq 2 1 5; seq 10 10 40)
   ["migrantsSize"]="2 6 10"
