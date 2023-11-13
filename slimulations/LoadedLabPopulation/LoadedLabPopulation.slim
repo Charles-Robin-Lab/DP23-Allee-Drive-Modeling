@@ -53,7 +53,7 @@ initialize() {
 }
 
 function (integer)chromosomePosition(integer$ chromosome) {
-	return c(asInteger(genomeSize*chromosome/chromosomeCount), asInteger(genomeSize*(chromosome+1)/chromosomeCount)-1);
+	return c(asInteger(round(genomeSize*chromosome/chromosomeCount)), asInteger(round(genomeSize*(chromosome+1)/chromosomeCount)-1));
 }
 
 function (void)defineConstantIfNotExist(string$ symbol, * value) {
@@ -100,7 +100,7 @@ function (void)defineConstantIfNotExist(string$ symbol, * value) {
 				genomeI = (genomeI + 1) % 2;
 			}
 			chromosomePos = chromosomePosition(chromosomeI);
-			genomesNeeded =asInteger(size(inds)*mutsFrequency*2);
+			genomesNeeded =asInteger(round(size(inds)*mutsFrequency*2));
 			startSample =((i)*genomesNeeded % size(inds));
 			endSample = (((i+1)*genomesNeeded -1) % size(inds));
 			print("a");
@@ -108,6 +108,7 @@ function (void)defineConstantIfNotExist(string$ symbol, * value) {
 			print(endSample);
 			
 			if (startSample < endSample){
+			if (startSample <= endSample){
 				sampledGenomes = (genomeI == 1 ? possibleCarrierGenome1s else possibleCarrierGenome2s)[startSample:endSample];
 			} else {
 				// we are sampling a bit of each chromosome in the pair, doesn't matter in the scheme of things...
@@ -118,7 +119,7 @@ function (void)defineConstantIfNotExist(string$ symbol, * value) {
 			
 			}
 //			print(asInteger((chromosomePos[1]-chromosomePos[0])*(((i%mutsPerChromosome)/(max(mutsPerChromosome-1,1.0))))+chromosomePos[0]));
-			sampledGenomes.addNewDrawnMutation(muts[i+1], asInteger((chromosomePos[1]-chromosomePos[0])*((((2*i+genomeI)%mutsPerChromosome)/max(mutsPerChromosome-1,1.0)))+chromosomePos[0]));
+			sampledGenomes.addNewDrawnMutation(muts[i+1], asInteger(round((chromosomePos[1]-chromosomePos[0])*((((2*i+genomeI)%mutsPerChromosome)/max(mutsPerChromosome-1,1.0)))+chromosomePos[0])));
 		}
 		else { 
 			sample(
