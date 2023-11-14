@@ -107,7 +107,6 @@ function (void)defineConstantIfNotExist(string$ symbol, * value) {
 			print(startSample);
 			print(endSample);
 			
-			if (startSample < endSample){
 			if (startSample <= endSample){
 				sampledGenomes = (genomeI == 1 ? possibleCarrierGenome1s else possibleCarrierGenome2s)[startSample:endSample];
 			} else {
@@ -124,8 +123,8 @@ function (void)defineConstantIfNotExist(string$ symbol, * value) {
 		else { 
 			sample(
 				possibleCarrierGenomes, 
-				asInteger(mutsFrequency*size(possibleCarrierGenomes))
-			).addNewDrawnMutation(muts[i+1], asInteger(genomeSize*(i)/mutsCount));
+				asInteger(round(mutsFrequency*size(possibleCarrierGenomes)))
+			).addNewDrawnMutation(muts[i+1], asInteger(round(genomeSize*(i)/mutsCount)));
 		}
 	}
 	if (!subpopsMutationsEvenlyDistributed) {

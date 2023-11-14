@@ -1,4 +1,5 @@
 library(extraDistr)
+library(dplyr)
 # library(devtools)
 # install_github("twolodzko/extraDistr")
 PMFHomozygotes <- function(N,NMutallele,NHomo) {
@@ -129,6 +130,7 @@ extendedSimRecurse <- function(loci, p, Ne, birthRate, carryingCapacity, nSample
     }
     out
 }
+
 extendedSimRecurse2 <- function(loci, p, Ne, birthRate, carryingCapacity, nSamples = 1000) {
     out = rep(Ne, nSamples)
     for (i in 1:nSamples) {
@@ -170,7 +172,7 @@ extendedSimRecurse2 <- function(loci, p, Ne, birthRate, carryingCapacity, nSampl
 
 
 
-
+## model 1/mostly bens code
 # some example parameters...
 loci <- 100 # number of loci
 freqRange <- seq(0.0, 0.3, by = 0.0025) # mean frequency in ancestral population
@@ -181,28 +183,30 @@ survivalW <- list()
 for (averageMutFreq in freqRange) {
     mutFreqs <- rep(averageMutFreq,loci)
     fitnessDecreases <- W(loci, mutFreqs, Ne)
-    survivalW <- append(survivalW, length(fitnessDecreases[fitnessDecreases > 1 / birthRate]) / length(fitnessDecreases))
+    survivalW <- append(survivalW, length(fitnessDecreases[fitnessDecreases < 2 / birthRate]) / length(fitnessDecreases))
 }
-par(new=TRUE)
 plot(freqRange, survivalW,col="red",ylim=c(0,1),pch=2,xlab="",ylab="")
+par(new=TRUE)
 
+## model 2
 survivalSingle <- list()
 for (averageMutFreq in freqRange) {
-    fitnessDecreases <- extendedSim(loci, averageMutFreq, Ne)/Ne
-    survivalSingle <- append(survivalSingle, length(fitnessDecreases[fitnessDecreases > 1 / birthRate]) / length(fitnessDecreases))
+    lambda <- extendedSim(loci, averageMutFreq, Ne) - Ne
+    survivalSingle <- append(survivalSingle, length(lambda[lambda < 1]) / length(lambda))
 }
+plot(freqRange, survivalSingle,col="green",ylim=c(0,1),pch=2,xlab="",ylab="")
 par(new=TRUE)
-plot(freqRange, survival,col="green",ylim=c(0,1),pch=2,xlab="",ylab="")
 
+## model 3
 survivalRecurse <- list()
 for (averageMutFreq in freqRange) {
     outcomeGroup <- extendedSimRecurse2(loci, averageMutFreq, Ne, birthRate, carryingCapacity)
     # fitnessDecreases <- W(loci, mutFreqs, Ne)
-    survivalRecurse <- append(survivalRecurse, length(outcomeGroup[outcomeGroup != "EXTINCT"]) / length(outcomeGroup))
+    survivalRecurse <- append(survivalRecurse, length(outcomeGroup[outcomeGroup == "EXTINCT"]) / length(outcomeGroup))
 }
 
+plot(head(freqRange,length(survivalRecurse)), survivalRecurse,col="blue",ylim=c(0,1),xlim=c(0,0.3),pch=2,xlab="",ylab="")
 par(new=TRUE)
-plot(head(freqRange,length(survivalRecurse)), survivalRecurse,col="blue",ylim=c(0,1),xlim=c(0,0.3),pch=0,xlab="",ylab="")
 
 
 # Pulling slim apart:
@@ -213,3 +217,15 @@ plot(head(freqRange,length(survivalRecurse)), survivalRecurse,col="blue",ylim=c(
 # a- genetic drift (allele frequency)
 # a- HW drift (genotype frequency)
 # x- Distribution of alleles within individuals
+
+
+# Load comparison
+slimData <- read.csv("./data/out_AnalyticalComparison_LIFP_1695296487.csv") %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate) %>% 
+  mutate(count = n()) %>%
+  mutate(extinctionProbability = sum(Result == "EXTINCT") / count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate,survivalRate, count) %>% 
+  summarise()
+
+dataSlice2d.MutationFrequency <- filter(slimData, MutationCount==100, Individuals == 25, GrowthRate == 3)
+plot(survivalRate~MutationFrequency,data=filter(dataSlice2d.MutationFrequency),col="black",ylim=c(0,1),xlim=c(0,0.3),xlab="Deleterious Recessive Frequency",ylab="Extinction Probability")
