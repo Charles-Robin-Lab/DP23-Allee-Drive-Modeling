@@ -7,7 +7,7 @@
 # The maximum running time of the job in days-hours:mins:sec
 #SBATCH --time=2-0:0:00
 # Parralelise the computation
-#SBATCH --array=1-800
+#SBATCH --array=1-200
 
 # # # run job code
 
