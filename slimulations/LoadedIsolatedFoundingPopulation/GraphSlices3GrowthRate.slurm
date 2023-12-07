@@ -17,26 +17,19 @@ module load SLiM/4.0.1
 source $bcpriSourcePath
 
 # nice graphs
-declare -A paramRanges=(
-  ["maximalAverageFemaleOffspring"]=$(seq 2.2 0.04 7)
-  ["migrantsSize"]=25
-  ["mutsFrequency"]=0.05
-  ["mutsCount"]=100
-  ["sterility"]=$(seq 0 1 1)
-)
 
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
-  ["maximalAverageFemaleOffspring"]=3.0
+  ["maximalAverageFemaleOffspring"]="$(seq 2.1 0.1 2.4) 3 8 10"
   ["migrantsSize"]=$(seq 2 1 120)
-  ["mutsFrequency"]=0.05
+  ["mutsFrequency"]="0.05 0.1"
   ["mutsCount"]=100
   ["sterility"]=$(seq 0 1 1)
 )
 
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
-  ["maximalAverageFemaleOffspring"]=3.0
+  ["maximalAverageFemaleOffspring"]="$(seq 2.1 0.1 2.4) 3 10"
   ["migrantsSize"]=25
   ["mutsFrequency"]=$(seq 0.04 0.002 0.15)
   ["mutsCount"]=100
@@ -45,9 +38,9 @@ declare -A paramRanges=(
 
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
-  ["maximalAverageFemaleOffspring"]=3.0
+  ["maximalAverageFemaleOffspring"]="$(seq 2.1 0.1 2.4) 3 8 10"
   ["migrantsSize"]=25
-  ["mutsFrequency"]=0.05
+  ["mutsFrequency"]="0.05 0.1"
   ["mutsCount"]=$(seq 1 1 120)
   ["sterility"]=$(seq 0 1 1)
 )
