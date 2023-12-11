@@ -26,63 +26,64 @@ diffBin<-function(z, n1, p1, n2, p2){
 xtestData <- read.csv("./data/out_50022325_2.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
   mutate(count = n()) %>%
-  mutate(expectedSurvivalRate = sum(Result != "EXTINCT") / count) %>%
-  filter(expectedSurvivalRate<0.975 && expectedSurvivalRate>0.025) %>%
+  mutate(expectedExtinctionRate = sum(Result == "EXTINCT") / count) %>%
+  filter(expectedExtinctionRate<0.975 && expectedExtinctionRate>0.025) %>%
   ungroup()  %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
   mutate(count = n()) %>%
-  mutate(survivalRate = sum(Result == "SURVIVED") / count) %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate,count,expectedSurvivalRate) %>% 
+  mutate(expectedExtinctionRate = sum(Result == "SURVIVED") / count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, expectedExtinctionRate,count) %>% 
   summarise()
 
-xlessData <- subset(xtestData[xtestData$Xlinked==1,], select = -c(Xlinked, survivalRate))
-xlessData$xlinkedDiffs <- xtestData[xtestData$Xlinked==1,]$survivalRate-xtestData[xtestData$Xlinked==0,]$survivalRate
+xlessData <- subset(xtestData[xtestData$Xlinked==1,], select = -c(Xlinked, expectedExtinctionRate))
+xlessData$xlinkedDiffs <- xtestData[xtestData$Xlinked==1,]$expectedExtinctionRate-xtestData[xtestData$Xlinked==0,]$expectedExtinctionRate
 cor(xlessData$xlinkedDiffs,xlessData)
-hist(xlessData$xlinkedDiffs,ylim=c(0,600),xlim=c(-0.25,0.25),breaks = seq(from=-0.405, to=0.405, by=0.01),xlab="Difference in survival between xlinked and autosomal")
+par(mar=c(5,4,2,2)+0.1)
+hist(xlessData$xlinkedDiffs,ylim=c(0,600),xlim=c(-0.25,0.25),breaks = seq(from=-0.405, to=0.405, by=0.01),main=NULL,xlab="Difference in extinction rates between xlinked and autosomal datapoints")
 
-s<-(-100):100
+s1<-(-100):100
 
-p <- xtestData[xtestData$Xlinked==1,]$expectedSurvivalRate
+p1 <- xtestData[xtestData$Xlinked==1,]$expectedExtinctionRate
 # n1 <- xtestData[xtestData$Xlinked==1,]$count
 # n2 <- xtestData[xtestData$Xlinked==0,]$count
 # y  <-rep(0, length(p))
 # for (i in seq_along(p)) {
 #   y[i] <-sapply(s, function(x) sum(diffBin(x, n1[i], p[i], n2[i], p[i])))
 # }
-y<-sapply(s, function(x) sum(diffBin(x, 100, p, 100, p)))
+y1<-sapply(s1, function(x) sum(diffBin(x, 100, p1, 100, p1)))
 par(new=TRUE)
-plot(s/100,y,ylim=c(0,600),xlim=c(-0.25,0.25),xlab='',ylab='')
+plot(s1/100,y1,ylim=c(0,600),xlim=c(-0.25,0.25),xlab='',ylab='')
 
 
 steriletestData <- read.csv("./data/out_50022325_2.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Xlinked) %>% 
   mutate(count = n()) %>%
-  mutate(expectedSurvivalRate = sum(Result != "EXTINCT") / count) %>%
-  filter(expectedSurvivalRate<0.975 && expectedSurvivalRate>0.025) %>%
+  mutate(expectedExtinctionRate = sum(Result == "EXTINCT") / count) %>%
+  filter(expectedExtinctionRate<0.975 && expectedExtinctionRate>0.025) %>%
   ungroup()  %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, expectedSurvivalRate) %>% 
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, expectedExtinctionRate) %>% 
   mutate(count = n()) %>%
-  mutate(survivalRate = sum(Result != "EXTINCT") / count) %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, survivalRate, expectedSurvivalRate, count) %>% 
+  mutate(expectedExtinctionRate = sum(Result == "EXTINCT") / count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, expectedExtinctionRate, count) %>% 
   summarise()
 
 
 
 
-sterileLessData <- subset(steriletestData[steriletestData$Sterile==1,], select = -c(Sterile, survivalRate))
-sterileDiffs <- steriletestData[steriletestData$Sterile==1,]$survivalRate-steriletestData[steriletestData$Sterile==0,]$survivalRate
+sterileLessData <- subset(steriletestData[steriletestData$Sterile==1,], select = -c(Sterile, expectedExtinctionRate))
+sterileDiffs <- steriletestData[steriletestData$Sterile==1,]$expectedExtinctionRate-steriletestData[steriletestData$Sterile==0,]$expectedExtinctionRate
 cor(sterileDiffs,sterileLessData)
-hist(sterileDiffs,ylim=c(0,600),xlim=c(-1.0,0.25),breaks = seq(from=-1.005, to=0.905, by=0.01),xlab="Difference in survival between lethal and sterile datapoints")
+hist(sterileDiffs,ylim=c(0,600),xlim=c(-0.25,1.0),breaks = seq(from=-1.005, to=0.905, by=0.01),main=NULL,xlab="Difference in extinction rates between sterile and lethal datapoints")
 # boxplot(sterileDiffs,xlessData$xlinkedDiffs,ylim=c(0,600),xlim=c(-0.80,0.40))
 
 
 #Example
 s<-(-100):100
 
-p <- steriletestData[steriletestData$Sterile==1,]$expectedSurvivalRate
+p <- steriletestData[steriletestData$Sterile==1,]$expectedExtinctionRate
 
 p<-sapply(s, function(x) sum(diffBin(x, 100, p, 100, p)))
 par(new=TRUE)
-plot(s/100,p,ylim=c(0,600),xlim=c(-1.0,0.25),xlab='',ylab='')
+plot(s/100,p,ylim=c(0,600),xlim=c(-0.25,1.0),xlab='',ylab='')
 
 

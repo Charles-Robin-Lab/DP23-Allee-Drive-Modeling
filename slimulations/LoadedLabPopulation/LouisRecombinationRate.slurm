@@ -16,6 +16,9 @@ module load GCC/11.3.0
 module load SLiM/4.0.1
 source $bcpriSourcePath
 
+#is the distribution of the locis the cause/ turn off the distribution toggle
+
+
 # (4+4)*3*2*5*8*800
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]=$(seq 2 1 5; seq 10 10 40)

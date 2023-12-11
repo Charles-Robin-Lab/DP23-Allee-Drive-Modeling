@@ -23,7 +23,19 @@ autosomalGraphData <- groupedGraphData[groupedGraphData$Xlinked==0,]
 # dataSlice2d.GrowthRate <- filter(autosomalData, MutationFrequency==0.11, MutationCount==61, Individuals == 22, Sterile==1)
 
 
+groupedGraphData <- read.csv("./data/out_GraphSlices3GrowthRate_LIFP_1701921562.csv") %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, FemaleOnlyEffect) %>% 
+  mutate(count = n()) %>%
+  mutate(survivalRate = sum(Result != "EXTINCT") / count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, FemaleOnlyEffect, survivalRate, count) %>% 
+  summarise()
+autosomalGraphData <- groupedGraphData[groupedGraphData$Xlinked==0,]
 
+gr <- 3
+mf <- 0.05
+dataSlice2d.MutationFrequency <- filter(autosomalGraphData, MutationCount==100, Individuals == 25, GrowthRate == gr, Sterile==1)
+dataSlice2d.MutationCount <- filter(autosomalGraphData, MutationFrequency==mf, Individuals == 25, GrowthRate == gr, Sterile==1)
+dataSlice2d.Individuals <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==100, GrowthRate == gr, Sterile==1)
 
 # MutationCount==60, MutationFrequency==0.10, Individuals == 20, GrowthRate == 4.0, Sterile==1
 
