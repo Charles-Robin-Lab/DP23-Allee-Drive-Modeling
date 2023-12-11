@@ -1,7 +1,8 @@
+install.packages("devtools")
+library(devtools)
+install_github("twolodzko/extraDistr")
 library(extraDistr)
 library(dplyr)
-# library(devtools)
-# install_github("twolodzko/extraDistr")
 PMFHomozygotes <- function(N,NMutallele,NHomo) {
     NWTallele <- 2*N-NMutallele
     Nhetero <- NMutallele - 2*NHomo
@@ -102,23 +103,20 @@ genotypeSim <- function(n, p, Ne, birthRate, nSamples = 1000) {
             currentMutCounts <- rbinom(loci, size = 2 * Ne, prob = p)
         }
         currentN <- round(Ne*birthRate)
+        # initialise with correct size 
+        currentGenotypeCounts <- matrix(0, 3, loci)
+        # Genotype dists
         for (j in 1:loci) {
-            # initialise with correct size 
-            currentGenotypeCounts <- matrix(0, 3, loci)
-            # Genotype dists
-            for (j in 1:loci) {
-               currentGenotypeCounts[1,j] <- rHomozygotes(currentN,currentMutCounts[j])
-               currentGenotypeCounts[2,j] <- currentMutCounts[j] - 2*currentGenotypeCounts[1,j]
-               currentGenotypeCounts[3,j] <- currentN - currentGenotypeCounts[2,j] - currentGenotypeCounts[1,j]
-            }
-            # eliminate Homozygotes
-            for (j in 1:loci) {
-                    # update genotype counts based on the already eliminated individuals
-                    currentGenotypeCounts[,j] <- rmvhyper(1,currentGenotypeCounts[,j],currentN)
-                    currentN <- currentN - currentGenotypeCounts[1,j]
-                    currentGenotypeCounts[1,j] <- 0
-            }
-       }
+            currentGenotypeCounts[1,j] <- rHomozygotes(currentN,currentMutCounts[j])
+            currentGenotypeCounts[2,j] <- currentMutCounts[j] - 2*currentGenotypeCounts[1,j]
+            currentGenotypeCounts[3,j] <- currentN - currentGenotypeCounts[2,j] - currentGenotypeCounts[1,j]
+        }
+        # eliminate Homozygotes
+        for (j in 1:loci) {
+                # update genotype counts based on the already eliminated individuals
+                currentGenotypeCounts[,j] <- rmvhyper(1,currentGenotypeCounts[,j],currentN)
+                currentN <- currentN - currentGenotypeCounts[1,j]
+        }
         out[i] <- currentN
     }
     out
@@ -133,7 +131,7 @@ recursiveSim <- function(loci, p, Ne, birthRate, carryingCapacity, nSamples = 10
         currentMutCounts <- rbinom(loci, size = 2 * Ne, prob = p)
         # initialise with correct size 
         currentGenotypeCounts <- matrix(0, 3, loci)
-       while(currentN > 0 && currentN < 80/birthRate) {
+        while(currentN > 0 && currentN < 80/birthRate) {
             # reproduce and drift
             nextN <- rpois(1,birthRate*currentN)
             for (j in 1:loci) {
@@ -142,9 +140,9 @@ recursiveSim <- function(loci, p, Ne, birthRate, carryingCapacity, nSamples = 10
             currentN <- nextN
             # Genotype dists
             for (j in 1:loci) {
-               currentGenotypeCounts[1,j] <- rHomozygotes(currentN,currentMutCounts[j])
-               currentGenotypeCounts[2,j] <- currentMutCounts[j] - 2*currentGenotypeCounts[1,j]
-               currentGenotypeCounts[3,j] <- currentN - currentGenotypeCounts[2,j] - currentGenotypeCounts[1,j]
+                currentGenotypeCounts[1,j] <- rHomozygotes(currentN,currentMutCounts[j])
+                currentGenotypeCounts[2,j] <- currentMutCounts[j] - 2*currentGenotypeCounts[1,j]
+                currentGenotypeCounts[3,j] <- currentN - currentGenotypeCounts[2,j] - currentGenotypeCounts[1,j]
             }
             # eliminate Homozygotes
             for (j in 1:loci) {
@@ -158,7 +156,7 @@ recursiveSim <- function(loci, p, Ne, birthRate, carryingCapacity, nSamples = 10
                 currentGenotypeCounts[,j] <- rmvhyper(1,currentGenotypeCounts[,j],currentN)
                 currentMutCounts[j] <- currentGenotypeCounts[2,j]
             }
-       }
+        }
         out[i] <- if (currentN<=0) "EXTINCT" else "SURVIVAL"
     }
     out
@@ -196,6 +194,7 @@ survivalSingle <- list()
 for (averageMutFreq in freqRange) {
     lambda <- (genotypeSim(loci, averageMutFreq, N0, birthRate))/N0
     survivalSingle <- append(survivalSingle, length(lambda[lambda < 1]) / length(lambda))
+    print(averageMutFreq)
 }
 plot(freqRange, survivalSingle,col="green",ylim=c(0,1),pch=2,xlab="",ylab="")
 par(new=TRUE)
@@ -206,6 +205,7 @@ for (averageMutFreq in freqRange) {
     outcomeGroup <- recursiveSim(loci, averageMutFreq, N0, birthRate, carryingCapacity)
     # fitnessDecreases <- W(loci, mutFreqs, N0)
     survivalRecurse <- append(survivalRecurse, length(outcomeGroup[outcomeGroup == "EXTINCT"]) / length(outcomeGroup))
+    print(averageMutFreq)
 }
 
 plot(head(freqRange,length(survivalRecurse)), survivalRecurse,col="blue",ylim=c(0,1),xlim=c(0,0.3),pch=2,xlab="",ylab="")
