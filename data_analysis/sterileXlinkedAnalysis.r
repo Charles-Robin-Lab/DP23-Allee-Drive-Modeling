@@ -39,7 +39,7 @@ xlessData <- subset(xtestData[xtestData$Xlinked==1,], select = -c(Xlinked, expec
 xlessData$xlinkedDiffs <- xtestData[xtestData$Xlinked==1,]$expectedExtinctionRate-xtestData[xtestData$Xlinked==0,]$expectedExtinctionRate
 cor(xlessData$xlinkedDiffs,xlessData)
 par(mar=c(5,4,2,2)+0.1)
-hist(xlessData$xlinkedDiffs,ylim=c(0,600),xlim=c(-0.25,0.25),breaks = seq(from=-0.405, to=0.405, by=0.01),main=NULL,xlab="Difference in extinction rates between xlinked and autosomal datapoints")
+hist(xlessData$xlinkedDiffs,ylim=c(0,600),xlim=c(-0.25,0.25),breaks = seq(from=-0.405, to=0.405, by=0.01),main=NULL,xlab="Difference in extinction rates between xlinked and autosomal datapoints",axes=FALSE)
 
 s1<-(-100):100
 
@@ -52,7 +52,7 @@ p1 <- xtestData[xtestData$Xlinked==1,]$expectedExtinctionRate
 # }
 y1<-sapply(s1, function(x) sum(diffBin(x, 100, p1, 100, p1)))
 par(new=TRUE)
-plot(s1/100,y1,ylim=c(0,600),xlim=c(-0.25,0.25),xlab='',ylab='')
+plot(s1/100,y1,ylim=c(0,600),xlim=c(-0.25,0.25),xlab='',ylab='',xaxp=c(-0.25, 0.25, 10))
 
 
 steriletestData <- read.csv("./data/out_50022325_2.csv") %>%
@@ -73,7 +73,7 @@ steriletestData <- read.csv("./data/out_50022325_2.csv") %>%
 sterileLessData <- subset(steriletestData[steriletestData$Sterile==1,], select = -c(Sterile, expectedExtinctionRate))
 sterileDiffs <- steriletestData[steriletestData$Sterile==1,]$expectedExtinctionRate-steriletestData[steriletestData$Sterile==0,]$expectedExtinctionRate
 cor(sterileDiffs,sterileLessData)
-hist(sterileDiffs,ylim=c(0,600),xlim=c(-0.25,1.0),breaks = seq(from=-1.005, to=0.905, by=0.01),main=NULL,xlab="Difference in extinction rates between sterile and lethal datapoints")
+hist(sterileDiffs,ylim=c(0,600),xlim=c(-0.2,1.0),breaks = seq(from=-1.005, to=0.905, by=0.01),main=NULL,xlab="Difference in extinction rates between sterile and lethal datapoints",axes=FALSE)
 # boxplot(sterileDiffs,xlessData$xlinkedDiffs,ylim=c(0,600),xlim=c(-0.80,0.40))
 
 
@@ -84,6 +84,6 @@ p <- steriletestData[steriletestData$Sterile==1,]$expectedExtinctionRate
 
 p<-sapply(s, function(x) sum(diffBin(x, 100, p, 100, p)))
 par(new=TRUE)
-plot(s/100,p,ylim=c(0,600),xlim=c(-0.25,1.0),xlab='',ylab='')
+plot(s/100,p,ylim=c(0,600),xlim=c(-0.2,1.0),xlab='',ylab='',xaxp=c(-0.2, 1.0, 12))
 
 

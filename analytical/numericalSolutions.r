@@ -1,6 +1,6 @@
-install.packages("devtools")
-library(devtools)
-install_github("twolodzko/extraDistr")
+# install.packages("devtools")
+# library(devtools)
+# install_github("twolodzko/extraDistr")
 library(extraDistr)
 library(dplyr)
 PMFHomozygotes <- function(N,NMutallele,NHomo) {
@@ -232,3 +232,27 @@ slimData <- read.csv("./data/out_AnalyticalComparison_LIFP_1695296487.csv") %>%
 
 dataSlice2d.MutationFrequency <- filter(slimData, MutationCount==100, Individuals == 25, GrowthRate == 3)
 plot(extinctionProbability~MutationFrequency,data=filter(dataSlice2d.MutationFrequency),col="black",ylim=c(0,1),xlim=c(0,0.3),xlab="Deleterious Recessive Frequency",ylab="Extinction Probability")
+
+
+freqRange <- read.csv("./data/analytical_model1.csv")$freqRange
+survivalW <- read.csv("./data/analytical_model1.csv")$unlist.survivalW.
+survivalSingle <- read.csv("./data/analytical_model2_2.csv")$unlist.survivalSingle.
+survivalRecurse <- read.csv("./data/analytical_model3.csv")$unlist.survivalRecurse.
+dataSlice2d.MutationFrequency <- read.csv("./data/modelslim.csv")
+
+
+plot(freqRange, survivalW,col="red",ylim=c(0,1),pch=2,xlab="",ylab="",axes = FALSE)
+par(new=TRUE)
+plot(freqRange, survivalSingle,col="green",ylim=c(0,1),pch=2,xlab="",ylab="",axes = FALSE)
+par(new=TRUE)
+plot(head(freqRange,length(survivalRecurse)), survivalRecurse,col="blue",ylim=c(0,1),xlim=c(0,0.3),pch=2,xlab="",ylab="",axes = FALSE)
+par(new=TRUE)
+plot(extinctionProbability~MutationFrequency,data=filter(dataSlice2d.MutationFrequency),col="black",ylim=c(0,1),xlim=c(0,0.3),xlab="Deleterious recessive frequency",ylab="Extinction probability")
+
+plot(freqRange, survivalW,col="red",ylim=c(0,1),xlim=c(0.05,0.2),pch=2,xlab="",ylab="",axes = FALSE)
+par(new=TRUE)
+plot(freqRange, survivalSingle,col="green",ylim=c(0,1),xlim=c(0.05,0.2),pch=2,xlab="",ylab="",axes = FALSE)
+par(new=TRUE)
+plot(head(freqRange,length(survivalRecurse)), survivalRecurse,col="blue",ylim=c(0,1),xlim=c(0.05,0.2),pch=2,xlab="",ylab="",axes = FALSE)
+par(new=TRUE)
+plot(extinctionProbability~MutationFrequency,data=filter(dataSlice2d.MutationFrequency),col="black",ylim=c(0,1),xlim=c(0.05,0.2),xlab="Deleterious recessive frequency",ylab="Extinction probability")
