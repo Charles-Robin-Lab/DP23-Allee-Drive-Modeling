@@ -15,11 +15,11 @@ initialize() {
     defineConstantIfNotExist("maximalAverageFemaleOffspring", 2.2);
     defineConstantIfNotExist("carryingCapacity", 1000);
     defineConstantIfNotExist("outputFilePath", "../data/out1.csv");
-    defineConstantIfNotExist("recombinationRate", 2.12e-8);
+    defineConstantIfNotExist("recombinationRate", 1e-8);
     //	WARNING: spacing between mutations untested if mutations % chromosomeCount != 0
     defineConstantIfNotExist("chromosomeCount", 1);
     // WARNING: max is 10,000 without further edits
-    defineConstantIfNotExist("maxGenerations", 100);
+    defineConstantIfNotExist("maxGenerations", 2000);
     defineGlobal("femaleReproductiveOutput", c(0.0, 0.0));
 
     initializeMutationRate(0.0);
