@@ -29,7 +29,7 @@ declare -A paramRanges=(
   ["mutsCount"]=$(seq 1 10 101)
   ["sterility"]=$(seq 0 1 1)
   ["xlinked"]=$(seq 0 1 1)
-  ["recombinationRate"]="1e-8"
+  ["recombinationRate"]="1e-5"
 )
 
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
