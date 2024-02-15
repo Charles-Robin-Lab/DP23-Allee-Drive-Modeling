@@ -27,7 +27,7 @@ declare -A paramRanges=(
 
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
-  ["maximalAverageFemaleOffspring"]=4.0
+  ["maximalAverageFemaleOffspring"]=3.0
   ["migrantsSize"]=$(seq 2 1 120)
   ["mutsFrequency"]=0.075
   ["mutsCount"]=80
@@ -36,7 +36,7 @@ declare -A paramRanges=(
 
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
-  ["maximalAverageFemaleOffspring"]=4.0
+  ["maximalAverageFemaleOffspring"]=3.0
   ["migrantsSize"]=25
   ["mutsFrequency"]=$(seq 0.00 0.002 0.15)
   ["mutsCount"]=80
@@ -45,7 +45,7 @@ declare -A paramRanges=(
 
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
-  ["maximalAverageFemaleOffspring"]=4.0
+  ["maximalAverageFemaleOffspring"]=3.0
   ["migrantsSize"]=25
   ["mutsFrequency"]=0.075
   ["mutsCount"]=$(seq 1 1 150)
