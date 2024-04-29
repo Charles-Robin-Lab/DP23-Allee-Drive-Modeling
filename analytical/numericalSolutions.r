@@ -100,7 +100,7 @@ genotypeSim <- function(n, p, Ne, birthRate, nSamples = 1000) {
             # NMutallele <- rbinom(1, size = 2 * currentN, prob = p)
             # Nhomozygous <- rHomozygotes(currentN,NMutallele)
             # currentN <- currentN - Nhomozygous
-            currentMutCounts <- rbinom(loci, size = 2 * Ne, prob = p)
+            currentMutCounts <- round(birthRate*rbinom(loci, size = 2 * Ne, prob = p))
         }
         currentN <- round(Ne*birthRate)
         # initialise with correct size 
@@ -168,6 +168,7 @@ recursiveSim <- function(loci, p, Ne, birthRate, carryingCapacity, nSamples = 10
 # some example parameters...
 loci <- 100 # number of loci
 freqRange <- seq(0.0, 0.3, by = 0.0025) # mean frequency in ancestral population
+# freqRange <- seq(0.0, 0.3, by = 0.05) # test
 N0 <- 25
 birthRate <- 3.0
 carryingCapacity <- 1000
@@ -256,3 +257,23 @@ par(new=TRUE)
 plot(head(freqRange,length(survivalRecurse)), survivalRecurse,col="blue",ylim=c(0,1),xlim=c(0.05,0.2),pch=2,xlab="",ylab="",axes = FALSE)
 par(new=TRUE)
 plot(extinctionProbability~MutationFrequency,data=filter(dataSlice2d.MutationFrequency),col="black",ylim=c(0,1),xlim=c(0.05,0.2),xlab="Deleterious recessive frequency",ylab="Extinction probability")
+
+
+plot(freqRange, survivalW,col="red",ylim=c(0,1),pch=2,xlab="",ylab="")
+par(new=TRUE)
+plot(freqRange, survivalSingle,col="green",ylim=c(0,1),pch=2,xlab="",ylab="")
+par(new=TRUE)
+plot(head(freqRange,length(survivalRecurse)), survivalRecurse,col="blue",ylim=c(0,1),xlim=c(0,0.3),pch=2,xlab="",ylab="")
+par(new=TRUE)
+plot(extinctionProbability~MutationFrequency,data=filter(dataSlice2d.MutationFrequency),col="black",ylim=c(0,1),xlim=c(0,0.3),xlab="Deleterious Recessive Frequency",ylab="Extinction Probability")
+
+
+
+write.csv(data.frame(freqRange,unlist(survivalW)),"./data/model1.csv")
+write.csv(data.frame(freqRange,unlist(survivalSingle)),"./data/model2_2.csv")
+write.csv(data.frame(freqRange,unlist(survivalRecurse)),"./data/model3.csv") 
+
+write.csv(dataSlice2d.MutationFrequency,"./data/modelslim.csv") 
+
+
+
