@@ -16,8 +16,8 @@ module load GCC/11.3.0
 module load SLiM/4.0.1
 source $bcpriSourcePath
 
+# 400*2*(4+3)*(119*2+56+120*2)
 # nice graphs
-
 runOverRanges "slim -d outputFilePath='$outputFile' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]="$(seq 2.1 0.1 2.4) 3 8 10"

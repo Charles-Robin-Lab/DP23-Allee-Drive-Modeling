@@ -35,7 +35,8 @@ sbatchOptions+=" --mail-type=FAIL"
 sbatchOptions+=" --mail-type=END"
 
 # log output files
-sbatchOptions+=" -o $projectDir/logs/slurm.$jobName.out" # STDOUT 
+# sbatchOptions+=" -o $projectDir/logs/slurm.$jobName.out" # STDOUT 
+sbatchOptions+=" -o /dev/null" # STDOUT 
 sbatchOptions+=" -e $projectDir/logs/slurm.$jobName.err" # STDERR
 
 

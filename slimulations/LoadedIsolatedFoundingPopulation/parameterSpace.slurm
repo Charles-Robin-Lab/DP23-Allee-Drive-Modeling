@@ -6,22 +6,13 @@
 # The maximum running time of the job in days-hours:mins:sec
 #SBATCH --time=3-0:0:00
 # Parralelise the computation
-#SBATCH --array=1-1200
+#SBATCH --array=1-400
 
 # Source files
 module load GCC/11.3.0
 module load SLiM/4.0.1
 source $bcpriSourcePath
-# full
-# declare -A paramRanges=(
-#   ["maximalGrowthRate"]=$(seq 0.1 0.1 1.5) $(seq 2 0.5 10)
-#   ["migrantsSize"]=$(seq 2 1 40)
-#   ["mutsFrequency"]=$(seq 0.01 0.01 0.20)
-#   ["mutsCount"]=$(seq 3 1 100)
-#   ["sterility"]=$(seq 0 1 1)
-#   ["xlinked"]=$(seq 0 1 1)
-# )
-# intial test
+# simiulation count: 400*(4+(46-6)/8+1)*((102-2)/10+1)*((0.31-0.01)/0.05+1)*((101-1)/10+1)*2*2*1
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]=$(seq 2.2 1.0 5.2; seq 6 8 46)
   ["migrantsSize"]=$(seq 2 10 102)
