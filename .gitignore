@@ -1,3 +1,4 @@
 slurm-*.out
 logs/
 *.csv
+.Rproj.user
