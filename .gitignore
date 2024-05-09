@@ -2,5 +2,6 @@ slurm-*.out
 logs/
 *.csv
 .Rproj.user
+*.Rproj
 data/*.csv
 out/*.pdf
