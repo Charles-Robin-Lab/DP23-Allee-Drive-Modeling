@@ -21,9 +21,9 @@ diffBin<-function(z, n1, p1, n2, p2){
   return(prob)
 }
 
+simulatedDataset <- "./data/out_50022325_2.csv"
 
-
-xtestData <- read.csv("./data/out_50022325_2.csv") %>%
+xtestData <- read.csv(simulatedDataset) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile) %>% 
   mutate(count = n()) %>%
   mutate(expectedExtinctionRate = sum(Result == "EXTINCT") / count) %>%
@@ -55,7 +55,7 @@ par(new=TRUE)
 plot(s1/100,y1,ylim=c(0,600),xlim=c(-0.25,0.25),xlab='',ylab='',xaxp=c(-0.25, 0.25, 10),cex=1.0)
 
 
-steriletestData <- read.csv("./data/out_50022325_2.csv") %>%
+steriletestData <- read.csv(simulatedDataset) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Xlinked) %>% 
   mutate(count = n()) %>%
   mutate(expectedExtinctionRate = sum(Result == "EXTINCT") / count) %>%
