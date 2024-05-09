@@ -3,3 +3,4 @@ logs/
 *.csv
 .Rproj.user
 data/*.csv
+out/*.pdf
