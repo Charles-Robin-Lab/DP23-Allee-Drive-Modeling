@@ -125,6 +125,7 @@ genotypeSim <- function(n, p, Ne, birthRate, nSamples = 1000) {
 
 
 recursiveSim <- function(loci, p, Ne, birthRate, carryingCapacity, nSamples = 1000) {
+    initialN = Ne
     out = rep(Ne, nSamples)
     for (i in 1:nSamples) {
         #  initial params
@@ -132,7 +133,7 @@ recursiveSim <- function(loci, p, Ne, birthRate, carryingCapacity, nSamples = 10
         currentMutCounts <- rbinom(loci, size = 2 * Ne, prob = p)
         # initialise with correct size 
         currentGenotypeCounts <- matrix(0, 3, loci)
-        while(currentN > 0 && currentN < 80/birthRate) {
+        while(currentN > 0 && currentN < max(2*initialN,1000)) {
             # reproduce and drift
             nextN <- rpois(1,birthRate*currentN)
             for (j in 1:loci) {
@@ -237,14 +238,16 @@ plot(extinctionProbability~MutationFrequency,data=filter(dataSlice2d.MutationFre
 
 write.csv(data.frame(freqRange,unlist(survivalW)),"./data/model1.csv")
 write.csv(data.frame(freqRange,unlist(survivalSingle)),"./data/model2_2.csv")
-write.csv(data.frame(freqRange,unlist(survivalRecurse)),"./data/model3.csv") 
+# write.csv(data.frame(freqRange,unlist(survivalRecurse)),"./data/model3.csv") 
+write.csv(data.frame(freqRange,unlist(survivalRecurse)),"./data/model3_rerun.csv") 
 
 write.csv(dataSlice2d.MutationFrequency,"./data/modelslim.csv") 
 
 freqRange <- read.csv("./data/analytical_model1.csv")$freqRange
 survivalW <- read.csv("./data/analytical_model1.csv")$unlist.survivalW.
 survivalSingle <- read.csv("./data/analytical_model2_2.csv")$unlist.survivalSingle.
-survivalRecurse <- read.csv("./data/analytical_model3.csv")$unlist.survivalRecurse.
+# survivalRecurse <- read.csv("./data/analytical_model3.csv")$unlist.survivalRecurse.
+survivalRecurse <- read.csv("./data/analytical_model3_rerun.csv")$unlist.survivalRecurse.
 dataSlice2d.MutationFrequency <- read.csv("./data/modelslim.csv")
 A = data.frame(x = freqRange, y = survivalW)
 B = data.frame(x = freqRange, y = survivalSingle)
