@@ -1,6 +1,7 @@
 
 
 # Packages
+library(svglite)
 library(ggplot2)
 library(dplyr)
 library(scales)
@@ -44,6 +45,8 @@ data$outcomeGroup <- factor(data$outcomeGroup, c("Carrying capacity reached","Ps
 
 outcomeProportion[autosomalRecombinationComparisonData$RecombinationRate==0]
 # stacked area chart
+
+svglite("figures/figure_4.svg", width = 8.2, height = 5.5)
 ggplot(data,log="x", aes(x=RecombinationRate, y=outcomeProportion, fill=outcomeGroup)) + 
     geom_area() +
     scale_x_continuous(trans='log10',limits = c(min(RecombinationRate[RecombinationRate!=0]), max(RecombinationRate)),
@@ -53,9 +56,9 @@ ggplot(data,log="x", aes(x=RecombinationRate, y=outcomeProportion, fill=outcomeG
     guides(fill=guide_legend(title="Outcome group")) +
     scale_fill_manual(values = c("#619CFF", "#00BA38", "#F8766D")) +
     scale_y_continuous(expand = c(0, 0)) +
-    annotation_logticks(sides="b") +
-    geom_vline(xintercept=2.1e-8, color="yellow")
-
+    annotation_logticks(sides="b") #+
+    # geom_vline(xintercept=2.1e-8, color="yellow")
+dev.off()
 
 require(pracma)
 
@@ -168,6 +171,8 @@ data$outcomeGroup <- factor(data$outcomeGroup, sort(unique(data$outcomeGroup), d
 #       facet_grid(vars(load), vars(linked)) 
 
 
+
+svglite("figures/figure_S4.svg", width = 4.1, height = 5.5)
 ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) + 
       # ggtitle(sprintf("Freq %f , loci %d",freq,lociCount)) +
       scale_x_continuous(breaks = round(seq(min(individuals), max(individuals), by = 15),1)) +
@@ -179,4 +184,4 @@ ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) +
       geom_area() + 
       guides(fill=guide_legend(title="Outcome group"))+
       facet_grid(vars(fct_rev(loci),freq), vars(linked))
-    
+dev.off()

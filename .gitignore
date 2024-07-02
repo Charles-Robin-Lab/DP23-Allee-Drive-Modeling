@@ -5,3 +5,4 @@ logs/
 *.Rproj
 data/*.csv
 out/*.pdf
+/figures

@@ -50,12 +50,12 @@ mod <- gbm.step(data = modelData, gbm.x = 1:5, gbm.y = 11,
 summary(mod)
 
 # make a plot of marginal predictor functions (omitting x-linked which doesn't do much)
-pdf("out/BRT-marginals.pdf")
-  gbm.plot(mod, n.plots = 4, 
-           plot.layout = c(2,2), 
-           rug = FALSE, 
-           y.label = "Difference in extinction rate",
-           write.title = FALSE)
+svg("figures/figure-S2.svg")
+gbm.plot(mod, n.plots = 4, 
+          plot.layout = c(2,2), 
+          rug = FALSE, 
+          y.label = "Difference in logit of extinction rate",
+          write.title = FALSE)
 dev.off()
 
 # Examine interactions
@@ -64,7 +64,16 @@ modInt$rank.list
 modInt$interactions
 
 # plot the most interesting two interactions
-pdf("out/BRT-interactions.pdf")
-  gbm.perspec(mod, 2, 1, z.range = c(-1, 5))
-  gbm.perspec(mod, 4, 3, z.range = c(-1, 9))
+svg("figures/figure-S3A.svg")
+  gbm.perspec(mod, 2, 1, z.range = c(-1, 5),
+          z.label = "Difference in logit of extinction rate",
+          y.label = "Deleterious recessive frequency",
+          x.label = "Deleterious loci count")
+dev.off()
+
+svg("figures/figure-S3B.svg")
+  gbm.perspec(mod, 4, 3, z.range = c(-1, 9),
+          z.label = "Difference in logit of extinction rate",
+          y.label = "Founding population size",
+          x.label = "Female reproductive output")
 dev.off()
