@@ -1,6 +1,5 @@
 library(dplyr)
 library(svglite)
-
 # groupedData <- read.csv("./data/out_51093850.csv") %>%
 #   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
 #   mutate(count = n()) %>%
@@ -69,7 +68,7 @@ plot(extinctionRate~Individuals,data=dataSlice2d.Individuals,ylim=c(0,1),ylab="E
 plot(extinctionRate~GrowthRate,data=dataSlice2d.GrowthRate,ylim=c(0,1),ylab="Extinction probability",xlab="Female reproductive output ")
 
 # # # # # # # # # # # # # # # # # # # # # # # # 
-# find the cool graphs
+# Figure 2 graphs
 mc <- 80
 mf <- 0.075
 i <- 25
@@ -83,10 +82,11 @@ groupedGraphData <- read.csv("./data/out_GraphSlices80,3_LIFP_1707892121.csv") %
   mutate(extinctionRate = sum(Result == "EXTINCT") / count) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate, extinctionRate, count) %>% 
   summarise()
-autosomalGraphData <- groupedGraphData[groupedGraphData$Xlinked==0,]
-dataSlice2d.MutationFrequency1 <- filter(autosomalGraphData, MutationCount==mc, Individuals == i, GrowthRate == gr1, Sterile==0)
-dataSlice2d.MutationCount1 <- filter(autosomalGraphData, MutationFrequency==mf, Individuals == i, GrowthRate == gr1, Sterile==0)
-dataSlice2d.Individuals1 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, GrowthRate == gr1, Sterile==0)
+autosomalGraphData <- filter(groupedGraphData,Xlinked==0,Sterile==0)
+dataSlice2d.MutationFrequency1 <- filter(autosomalGraphData, MutationCount==mc, Individuals == i, GrowthRate == gr1)
+dataSlice2d.MutationCount1 <- filter(autosomalGraphData, MutationFrequency==mf, Individuals == i, GrowthRate == gr1)
+dataSlice2d.Individuals1 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, GrowthRate == gr1)
+dataSlice2d.GrowthRate1 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, Individuals == i)
 
 groupedGraphData <- read.csv("./data/out_GraphSlices80.3.5_LIFP_1707968395.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate) %>% 
@@ -94,10 +94,11 @@ groupedGraphData <- read.csv("./data/out_GraphSlices80.3.5_LIFP_1707968395.csv")
   mutate(extinctionRate = sum(Result == "EXTINCT") / count) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate, extinctionRate, count) %>% 
   summarise()
-autosomalGraphData <- groupedGraphData[groupedGraphData$Xlinked==0,]
-dataSlice2d.MutationFrequency2 <- filter(autosomalGraphData, MutationCount==mc, Individuals == i, GrowthRate == gr2, Sterile==0)
-dataSlice2d.MutationCount2 <- filter(autosomalGraphData, MutationFrequency==mf, Individuals == i, GrowthRate == gr2, Sterile==0)
-dataSlice2d.Individuals2 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, GrowthRate == gr2, Sterile==0)
+autosomalGraphData <- filter(groupedGraphData,Xlinked==0,Sterile==0)
+dataSlice2d.MutationFrequency2 <- filter(autosomalGraphData, MutationCount==mc, Individuals == i, GrowthRate == gr2)
+dataSlice2d.MutationCount2 <- filter(autosomalGraphData, MutationFrequency==mf, Individuals == i, GrowthRate == gr2)
+dataSlice2d.Individuals2 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, GrowthRate == gr2)
+dataSlice2d.GrowthRate2 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, Individuals == i)
 
 groupedGraphData <- read.csv("./data/out_GraphSlices80_LIFP_1707968384.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate) %>% 
@@ -105,16 +106,11 @@ groupedGraphData <- read.csv("./data/out_GraphSlices80_LIFP_1707968384.csv") %>%
   mutate(extinctionRate = sum(Result == "EXTINCT") / count) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate, extinctionRate, count) %>% 
   summarise()
-autosomalGraphData <- groupedGraphData[groupedGraphData$Xlinked==0,]
-dataSlice2d.MutationCount3 <- filter(autosomalGraphData, MutationFrequency==mf, Individuals == i, GrowthRate == gr3, Sterile==0)
-dataSlice2d.MutationFrequency3 <- filter(autosomalGraphData, MutationCount==mc, Individuals == i, GrowthRate == gr3, Sterile==0)
-dataSlice2d.Individuals3 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, GrowthRate == gr3, Sterile==0)
-dataSlice2d.GrowthRate3 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, Individuals == i, Sterile==0)
-
-# dataSlice2d.MutationFrequency <- filter(autosomalGraphData, MutationCount==81, Individuals == 12, GrowthRate == 3.2, Xlinked==0, Sterile==0)
-# dataSlice2d.MutationCount <- filter(autosomalGraphData, MutationFrequency==0.0, Individuals == 12, GrowthRate == 3.2, Xlinked==0, Sterile==0)
-# dataSlice2d.Individuals <- filter(autosomalGraphData, MutationFrequency==0.06, MutationCount==81, GrowthRate == 3.2, Xlinked==0, Sterile==0)
-# dataSlice2d.GrowthRate <- filter(autosomalGraphData, MutationFrequency==0.06, MutationCount==81, Individuals == 12, Xlinked==0, Sterile==0)
+autosomalGraphData <- filter(groupedGraphData,Xlinked==0,Sterile==0)
+dataSlice2d.MutationCount3 <- filter(autosomalGraphData, MutationFrequency==mf, Individuals == i, GrowthRate == gr3)
+dataSlice2d.MutationFrequency3 <- filter(autosomalGraphData, MutationCount==mc, Individuals == i, GrowthRate == gr3)
+dataSlice2d.Individuals3 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, GrowthRate == gr3)
+dataSlice2d.GrowthRate3 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, Individuals == i)
 
 
 
@@ -123,34 +119,28 @@ plot(extinctionRate~GrowthRate,data=dataSlice2d.GrowthRate3,ylim=c(0,1),ylab="Ex
 dev.off()
 
 svglite("figures/figure_2B.svg", width = 5.8, height = 4.35)
-plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency3,ylim=c(0,1),ylab="Extinction probability",xlab="Deleterious recessive frequency",col="#68c24f",pch=19)
+plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency3,ylim=c(0,1),xlim=c(0,0.15),ylab="Extinction probability",xlab="Deleterious recessive frequency",col="#68c24f",pch=19)
 par(new=TRUE)
-plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency2,ylim=c(0,1),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
+plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency2,ylim=c(0,1),xlim=c(0,0.15),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
 par(new=TRUE)
-plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency1,ylim=c(0,1),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
+plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency1,ylim=c(0,1),xlim=c(0,0.15),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
 dev.off()
 
 svglite("figures/figure_2C.svg", width = 5.8, height = 4.35)
-plot(extinctionRate~Individuals,data=dataSlice2d.Individuals3,ylim=c(0,1),ylab="Extinction probability",xlab="Founding population size",col="#68c24f",pch=19)
+plot(extinctionRate~Individuals,data=dataSlice2d.Individuals3,ylim=c(0,1),xlim=c(0,120),ylab="Extinction probability",xlab="Founding population size",col="#68c24f",pch=19)
 par(new=TRUE)
-plot(extinctionRate~Individuals,data=dataSlice2d.Individuals2,ylim=c(0,1),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
+plot(extinctionRate~Individuals,data=dataSlice2d.Individuals2,ylim=c(0,1),xlim=c(0,120),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
 par(new=TRUE)
-plot(extinctionRate~Individuals,data=dataSlice2d.Individuals1,ylim=c(0,1),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
+plot(extinctionRate~Individuals,data=dataSlice2d.Individuals1,ylim=c(0,1),xlim=c(0,120),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
 dev.off()
 
 svglite("figures/figure_2D.svg", width = 5.8, height = 4.35)
-plot(extinctionRate~MutationCount,data=dataSlice2d.MutationCount3,ylim=c(0,1),ylab="Extinction probability",xlab="Deleterious loci count",col="#68c24f",pch=19)
+plot(extinctionRate~MutationCount,data=dataSlice2d.MutationCount3,ylim=c(0,1),xlim=c(0,150),ylab="Extinction probability",xlab="Deleterious loci count",col="#68c24f",pch=19)
 par(new=TRUE)
-plot(extinctionRate~MutationCount,data=dataSlice2d.MutationCount2,ylim=c(0,1),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
+plot(extinctionRate~MutationCount,data=dataSlice2d.MutationCount2,ylim=c(0,1),xlim=c(0,150),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
 par(new=TRUE)
-plot(extinctionRate~MutationCount,data=dataSlice2d.MutationCount1,ylim=c(0,1),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
+plot(extinctionRate~MutationCount,data=dataSlice2d.MutationCount1,ylim=c(0,1),xlim=c(0,150),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
 dev.off()
-
-plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency2,ylim=c(0,1),ylab="Extinction probability",xlab="Deleterious recessive frequency",pch=19)
-plot(extinctionRate~MutationCount,data=dataSlice2d.MutationCount2,ylim=c(0,1),ylab="Extinction probability",xlab="Deleterious loci count",pch=19)
-plot(extinctionRate~Individuals,data=dataSlice2d.Individuals2,ylim=c(0,1),ylab="Extinction probability",xlab="Founding population size",pch=19)
-
-
 
 
 
