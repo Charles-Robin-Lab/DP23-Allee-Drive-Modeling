@@ -76,7 +76,7 @@ gr1 <- 3
 gr2 <- 3.5
 gr3 <- 4
 
-groupedGraphData <- read.csv("./data/out_GraphSlices80,3_LIFP_1707892121.csv") %>%
+groupedGraphData <- read.csv("./data/out_GraphSlices80.3_LIFP_1735381152.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate) %>% 
   mutate(count = n()) %>%
   mutate(extinctionRate = sum(Result == "EXTINCT") / count) %>%
@@ -115,7 +115,13 @@ dataSlice2d.GrowthRate3 <- filter(autosomalGraphData, MutationFrequency==mf, Mut
 
 
 svglite("figures/figure_2A.svg", width = 5.8, height = 4.35)
-plot(extinctionRate~GrowthRate,data=dataSlice2d.GrowthRate3,ylim=c(0,1),ylab="Extinction probability",xlab="Female reproductive output ",pch=19)
+plot(extinctionRate~GrowthRate,data=filter(dataSlice2d.GrowthRate1,GrowthRate!=3,GrowthRate!=3.5,GrowthRate!=4),ylim=c(0,1),xlim=c(2,6),ylab="Extinction probability",xlab="Female reproductive output ",pch=19)
+par(new=TRUE)
+plot(extinctionRate~GrowthRate,data=filter(dataSlice2d.GrowthRate1,GrowthRate==3),ylim=c(0,1),xlim=c(2,6),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
+par(new=TRUE)
+plot(extinctionRate~GrowthRate,data=filter(dataSlice2d.GrowthRate2,GrowthRate==3.5),ylim=c(0,1),xlim=c(2,6),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
+par(new=TRUE)
+plot(extinctionRate~GrowthRate,data=filter(dataSlice2d.GrowthRate3,GrowthRate==4),ylim=c(0,1),xlim=c(2,6),axes=FALSE,col="#68c24f",pch=19,ylab="",xlab="")
 dev.off()
 
 svglite("figures/figure_2B.svg", width = 5.8, height = 4.35)
@@ -124,6 +130,7 @@ par(new=TRUE)
 plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency2,ylim=c(0,1),xlim=c(0,0.15),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
 par(new=TRUE)
 plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency1,ylim=c(0,1),xlim=c(0,0.15),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
+abline(v=0.075,lty=2)
 dev.off()
 
 svglite("figures/figure_2C.svg", width = 5.8, height = 4.35)
@@ -132,6 +139,7 @@ par(new=TRUE)
 plot(extinctionRate~Individuals,data=dataSlice2d.Individuals2,ylim=c(0,1),xlim=c(0,120),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
 par(new=TRUE)
 plot(extinctionRate~Individuals,data=dataSlice2d.Individuals1,ylim=c(0,1),xlim=c(0,120),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
+abline(v=25,lty=2)
 dev.off()
 
 svglite("figures/figure_2D.svg", width = 5.8, height = 4.35)
@@ -140,6 +148,7 @@ par(new=TRUE)
 plot(extinctionRate~MutationCount,data=dataSlice2d.MutationCount2,ylim=c(0,1),xlim=c(0,150),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
 par(new=TRUE)
 plot(extinctionRate~MutationCount,data=dataSlice2d.MutationCount1,ylim=c(0,1),xlim=c(0,150),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
+abline(v=80,lty=2)
 dev.off()
 
 

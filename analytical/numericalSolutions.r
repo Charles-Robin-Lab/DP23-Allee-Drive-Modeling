@@ -71,7 +71,7 @@ rGeneDrift <- function(Nmuts,prevN,nextN) {
 # a function for generating samples of S, with W_0 = 1
 basicSim <- function(loci, p, Ne, nSamples = 1000) {
     phat <- rbinom(loci * nSamples, size = 2 * Ne, prob = p) # exact binomial draw
-    phat <- matrix(phat, nrow = loci) # n x nSamples matrix
+    phat <- matrix(phat, nrow = loci) # loci x nSamples matrix
     #   sample binomial amount of homozygotes
     #   Nhomozygous <- round(Ne*(phat/(2*Ne)^2))
     apply(phat, 2, function(x) {
