@@ -13,7 +13,7 @@ projectDir="/home/lnowellnicol/punim2001/DP23-Allee-Drive-Modeling"
 
 
 # Partition for the job:
-sbatchOptions="--partition=cascade"
+sbatchOptions="--partition=sapphire"
 
 # Multithreaded (SMP) job: must run on one node 
 sbatchOptions+=" --nodes=1"

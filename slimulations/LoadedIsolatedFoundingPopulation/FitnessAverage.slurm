@@ -5,9 +5,9 @@
 # # # Settings for Sbatch
 
 # The maximum running time of the job in days-hours:mins:sec
-#SBATCH --time=1-0:0:00
+#SBATCH --time=4-0:0:00
 # Parralelise the computation
-#SBATCH --array=1-1000
+#SBATCH --array=1-9000
 
 # # # run job code
 
@@ -23,7 +23,7 @@ declare -A paramRanges=(
   ["mutsCount"]=80
   ["sterility"]=0
 )
-runOverRanges "slim -d fitnessLogFilePath='$outputFile' outputFilePath='/dev/null' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d fitnessLogFilePath='$outputFile' -d outputFilePath='/dev/null' %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]=3.5
@@ -33,7 +33,7 @@ declare -A paramRanges=(
   ["sterility"]=0
 )
 
-runOverRanges "slim -d fitnessLogFilePath='$outputFile' outputFilePath='/dev/null'  %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d fitnessLogFilePath='$outputFile' -d outputFilePath='/dev/null'  %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 declare -A paramRanges=(
   ["maximalAverageFemaleOffspring"]=4
   ["migrantsSize"]=25
@@ -42,7 +42,7 @@ declare -A paramRanges=(
   ["sterility"]=0
 )
 
-runOverRanges "slim -d fitnessLogFilePath='$outputFile' outputFilePath='/dev/null'  %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
+runOverRanges "slim -d fitnessLogFilePath='$outputFile' -d outputFilePath='/dev/null'  %s LoadedIsolatedFoundingPopulation.slim" "-d" paramRanges
 
 ##DO NOT ADD/EDIT BEYOND THIS LINE##
 ##Job monitor command to list the resource usage
