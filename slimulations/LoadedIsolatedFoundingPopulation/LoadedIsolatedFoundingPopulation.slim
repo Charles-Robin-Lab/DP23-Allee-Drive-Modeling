@@ -12,7 +12,7 @@ initialize() {
     defineConstantIfNotExist("migrantsSize", 25);
     defineConstantIfNotExist("sterility", F);
     defineConstantIfNotExist("xlinked", F);
-    defineConstantIfNotExist("maximalAverageFemaleOffspring", 2.2);
+    defineConstantIfNotExist("maximalAverageFemaleOffspring", 3.5);
     defineConstantIfNotExist("carryingCapacity", 1000);
     defineConstantIfNotExist("outputFilePath", "../data/out1.csv");
     // defineConstantIfNotExist("fitnessLogFilePath", "./out2.csv");
@@ -134,7 +134,7 @@ modifyChild() {
     return !any(2 <= copiesOfMutations(child, community.allMutationTypes));
 }
 
-// this function assumes a sexed population with femaleOnlyEffect and a lethal effect
+// this function assumes a sexed population with lethal effect
 function(float) calculateMeanFitness(o<Subpopulation>$ subpop) {
     females = subpop.subsetIndividuals(sex='F');
     males = subpop.subsetIndividuals(sex='M');
@@ -145,10 +145,16 @@ function(float) calculateMeanFitness(o<Subpopulation>$ subpop) {
         // are they sterile?
         if (any(2 <= mutsf))
                 next;
-        for (indm in males) {
+        for (indm in males) { 
             mutsm = copiesOfMutations(indm, community.allMutationTypes[mutsf]);
-            // 1 mut => 75% viable progeny, 2 => 50%
-            fitnessCoeffecients = 1-mutsm/4;
+            if (!femaleOnlyEffect & sterility) {
+                if (any(2 <= mutsm)) {
+                    next;
+                }
+            }
+            // femaleOnlyEffect: 1 mut => 87.5% viable progeny, 2 => 75%
+            // both: 1 mut => 75% viable progeny
+            fitnessCoeffecients = 1-mutsm/(4*(1+femaleOnlyEffect));
             pairFitness = cumProduct(fitnessCoeffecients)[size(mutsm)-1];
             femaleFitness = femaleFitness + pairFitness;
         }
