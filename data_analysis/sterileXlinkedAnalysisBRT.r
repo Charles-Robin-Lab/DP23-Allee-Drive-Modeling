@@ -31,12 +31,29 @@ modelData <- d %>%
   ungroup() %>%
   as.data.frame() # else dismo cries
   
-
 boxplot(modelData$diffExtinctionRate)
+
+# gbm errors if we use spaces, interspersed ts will be remove in post
+names(modelData)[names(modelData) == "GrowthRate"] <- "Femaletreproductivetoutput"
+names(modelData)[names(modelData) == "Individuals"] <- "Foundingtpopulationtsize"
+names(modelData)[names(modelData) == "MutationFrequency"] <- "Deleterioustrecessivetfrequency"
+names(modelData)[names(modelData) == "MutationCount"] <- "Deleterioustlocitcount"
+
+
+
+# modelData <- modelData %>% 
+#   rename(
+#     `Female reproductive output` = `GrowthRate`,
+#     `Founding population size` = `Individuals`,
+#     `Deleterious recessive frequency` = `MutationFrequency`,
+#     `Deleterious loci count` = `MutationCount`
+#     )
 
 ####### Use diffExtinctionRate as response variable in BRT #########
 
 # load dismo here to avoid conflict with select() in dplyr
+# install.packages("dismo")
+# install.packages("gbm")
 library(dismo)
 
 # fit a model

@@ -7,7 +7,7 @@ library(dplyr)
 library(scales)
 library(gridExtra)
 
-recombinationComparisonData <- read.csv("./data/recombinationComparison3.csv") %>%
+recombinationComparisonData <- read.csv("./data/out_Recombination_LIFPIC_1747152563.csv  ") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED" ) / count) %>%
@@ -34,7 +34,7 @@ recombinationComparisonData <- read.csv("./data/recombinationComparison3.csv") %
 
  
 # create data
-autosomalRecombinationComparisonData<- filter(recombinationComparisonData, Xlinked==0)
+autosomalRecombinationComparisonData<- filter(recombinationComparisonData, Xlinked==0, Sterile==0)
 RecombinationRate <- rep(autosomalRecombinationComparisonData$RecombinationRate,times=3)
 outcomeProportion <- c(1-autosomalRecombinationComparisonData$survivalRate - autosomalRecombinationComparisonData$loadSurvivalRate,autosomalRecombinationComparisonData$loadSurvivalRate,autosomalRecombinationComparisonData$survivalRate)
 outcomeGroup <- rep(c("Extinction","Pseudo-overdominance survival","Carrying capacity reached"),each=length(autosomalRecombinationComparisonData$RecombinationRate))
@@ -59,6 +59,8 @@ ggplot(data,log="x", aes(x=RecombinationRate, y=outcomeProportion, fill=outcomeG
     annotation_logticks(sides="b") #+
     # geom_vline(xintercept=2.1e-8, color="yellow")
 dev.off()
+
+# install.packages("pracma")
 
 require(pracma)
 
@@ -93,8 +95,13 @@ for (spaceSlice in slices) {
   outcomeProportion <- c(1-linkedData$survivalRate - linkedData$loadSurvivalRate,linkedData$loadSurvivalRate,linkedData$survivalRate)
   outcomeGroup <- rep(c("Extinction","Loaded survival","Survival"),each=length(linkedData$MutationCount))
   data <- data.frame(individuals, outcomeProportion, outcomeGroup)
+  print("linked")
   df <- filter(data,outcomeGroup=="Extinction")
-  AUC <- trapz(df$individuals,df$outcomeProportion)
+  print(trapz(df$individuals,df$outcomeProportion)/0.9)
+  df <- filter(data,outcomeGroup=="Loaded survival")
+  print(trapz(df$individuals,df$outcomeProportion)/0.9)
+  df <- filter(data,outcomeGroup=="Survival")
+  print(trapz(df$individuals,df$outcomeProportion)/0.9)
 
 
   print(ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) + 
@@ -114,8 +121,13 @@ for (spaceSlice in slices) {
   outcomeProportion <- c(1-unlinkedData$survivalRate - unlinkedData$loadSurvivalRate,unlinkedData$loadSurvivalRate,unlinkedData$survivalRate)
   outcomeGroup <- rep(c("Extinction","Loaded survival","Survival"),each=length(unlinkedData$MutationCount))
   data <- data.frame(individuals, outcomeProportion, outcomeGroup)
+  print("unlinked")
   df <- filter(data,outcomeGroup=="Extinction")
-  AUC <- trapz(df$individuals,df$outcomeProportion)
+  print(trapz(df$individuals,df$outcomeProportion)/0.9)
+  df <- filter(data,outcomeGroup=="Loaded survival")
+  print(trapz(df$individuals,df$outcomeProportion)/0.9)
+  df <- filter(data,outcomeGroup=="Survival")
+  print(trapz(df$individuals,df$outcomeProportion)/0.9)
   print(ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) + 
       # ggtitle(sprintf("Freq %f , loci %d",freq,lociCount)) +
       theme_void() +
@@ -130,6 +142,7 @@ for (spaceSlice in slices) {
       )
 }
 
+# install.packages("tidyverse")
 
 library(tidyverse)
 spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.1,MutationCount==100)
@@ -170,9 +183,8 @@ data$outcomeGroup <- factor(data$outcomeGroup, sort(unique(data$outcomeGroup), d
 #       geom_area() + guides(fill=guide_legend(title="Outcome group"))+
 #       facet_grid(vars(load), vars(linked)) 
 
-
-
 svglite("figures/figure_S4.svg", width = 4.1, height = 5.5)
+
 ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) + 
       # ggtitle(sprintf("Freq %f , loci %d",freq,lociCount)) +
       scale_x_continuous(breaks = round(seq(min(individuals), max(individuals), by = 15),1)) +
@@ -182,6 +194,7 @@ ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) +
       ylab("Outcome proportion") +
       scale_fill_manual(values = c("#619CFF", "#00BA38", "#F8766D")) +
       geom_area() + 
+      geom_text(data = ann_text,label = "Text") +
       guides(fill=guide_legend(title="Outcome group"))+
       facet_grid(vars(fct_rev(loci),freq), vars(linked))
 dev.off()

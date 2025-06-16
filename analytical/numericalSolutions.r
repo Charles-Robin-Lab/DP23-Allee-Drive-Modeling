@@ -26,7 +26,7 @@ rHomozygotes <- function(N,Nmuts) {
         #     print(N)
         # }
         if (!is.na(p)) {
-           cdf <- cdf + p
+            cdf <- cdf + p
         }
         if (i>N*2) {
             # print("Error! too much growth")
@@ -55,7 +55,7 @@ rGeneDrift <- function(Nmuts,prevN,nextN) {
             # print(p)
         # }
         if (!is.na(p)) {
-           cdf <- cdf + p
+            cdf <- cdf + p
         }
         if (i>nextN*2) {
             # print("Error! too much growth")
@@ -80,30 +80,27 @@ basicSim <- function(loci, p, Ne, nSamples = 1000) {
     })
 }
 
-extendedSim <- function(n, p, Ne, nSamples = 1000) {
-    out = rep(Ne, nSamples)
-    for (i in 1:nSamples) {
-        currentN <- Ne
-       for (j in 1:loci) {
-            NMutallele <- rbinom(1, size = 2 * currentN, prob = p)
-            Nhomozygous <- rHomozygotes(currentN,NMutallele)
-            currentN <- currentN - Nhomozygous
-       }
-        out[i] <- currentN
-    }
-    out
-}
+# extendedSim <- function(n, p, Ne, nSamples = 1000) {
+#     out = rep(Ne, nSamples)
+#     for (i in 1:nSamples) {
+#         currentN <- Ne
+#         for (j in 1:loci) {
+#             NMutallele <- rbinom(1, size = 2 * currentN, prob = p)
+#             Nhomozygous <- rHomozygotes(currentN,NMutallele)
+#             currentN <- currentN - Nhomozygous
+#         }
+#         out[i] <- currentN
+#     }
+#     out
+# }
 
-genotypeSim <- function(n, p, Ne, birthRate, nSamples = 1000) {
+genotypeSim <- function(n, p, Ne, birthRate, carryingCapacity, nSamples = 1000) {
     out = rep(Ne, nSamples)
     for (i in 1:nSamples) {
+        currentN <- round(Ne * carryingCapacity * birthRate / (carryingCapacity + birthRate * Ne - Ne))
         for (j in 1:loci) {
-            # NMutallele <- rbinom(1, size = 2 * currentN, prob = p)
-            # Nhomozygous <- rHomozygotes(currentN,NMutallele)
-            # currentN <- currentN - Nhomozygous
-            currentMutCounts <- round(birthRate*rbinom(loci, size = 2 * Ne, prob = p))
+            currentMutCounts <- round(currentN/Ne*rbinom(loci, size = 2 * Ne, prob = p))
         }
-        currentN <- round(Ne*birthRate)
         # initialise with correct size 
         currentGenotypeCounts <- matrix(0, 3, loci)
         # Genotype dists
@@ -133,9 +130,12 @@ recursiveSim <- function(loci, p, Ne, birthRate, carryingCapacity, nSamples = 10
         currentMutCounts <- rbinom(loci, size = 2 * Ne, prob = p)
         # initialise with correct size 
         currentGenotypeCounts <- matrix(0, 3, loci)
-        while(currentN > 0 && currentN < max(2*initialN,1000)) {
+        generations <- 0
+        while(currentN > 0 && currentN < carryingCapacity && generations <= 2000) {
+            generations <- generations + 1
             # reproduce and drift
-            nextN <- rpois(1,birthRate*currentN)
+            # DELETE:nextN <- rpois(1,birthRate*currentN)
+            nextN <- rpois(1, currentN * carryingCapacity * birthRate / (carryingCapacity + birthRate * currentN - currentN))
             for (j in 1:loci) {
                 currentMutCounts[j] <- rGeneDrift(currentMutCounts[j],currentN,nextN)
             }
@@ -159,7 +159,7 @@ recursiveSim <- function(loci, p, Ne, birthRate, carryingCapacity, nSamples = 10
                 currentMutCounts[j] <- currentGenotypeCounts[2,j]
             }
         }
-        out[i] <- if (currentN<=0) "EXTINCT" else "SURVIVAL"
+        out[i] <- if (currentN<=0) "EXTINCT" else  if (generations>=2000) "LOADED_SURVIVAL" else "SURVIVAL"
     }
     out
 }
@@ -168,8 +168,8 @@ recursiveSim <- function(loci, p, Ne, birthRate, carryingCapacity, nSamples = 10
 
 ## model 1/mostly bens code
 # some example parameters...
-loci <- 100 # number of loci
-freqRange <- seq(0.0, 0.3, by = 0.0025) # mean frequency in ancestral population
+loci <- 200 # number of loci
+freqRange <- seq(0.0, 0.10, by = 0.00125) # mean frequency in ancestral population
 # freqRange <- seq(0.0, 0.3, by = 0.05) # test
 N0 <- 25
 birthRate <- 3.0
@@ -177,11 +177,12 @@ carryingCapacity <- 1000
 survivalW <- list()
 for (averageMutFreq in freqRange) {
     mutFreqs <- rep(averageMutFreq,loci)
-    lambda <- birthRate*basicSim(loci, mutFreqs, N0)
+    lambda <- carryingCapacity * birthRate / (carryingCapacity + birthRate * N0 - N0)*basicSim(loci, mutFreqs, N0)
     survivalW <- append(survivalW, length(lambda[lambda < 1]) / length(lambda))
 }
 plot(freqRange, survivalW,col="red",ylim=c(0,1),pch=2,xlab="",ylab="")
 par(new=TRUE)
+write.csv(data.frame(freqRange,unlist(survivalW)),paste("./data/model1",as.character(threadI),".csv",sep = ""))
 
 # ## model 2
 # survivalSingle <- list()
@@ -192,28 +193,59 @@ par(new=TRUE)
 # plot(freqRange, survivalSingle,col="green",ylim=c(0,1),pch=2,xlab="",ylab="")
 # par(new=TRUE)
 
+
+model2 <- function(loci, averageMutFreq, N0, birthRate, carryingCapacity) {
+    lambda <- (genotypeSim(loci, averageMutFreq, N0, birthRate, carryingCapacity))/N0
+    length(lambda[lambda < 1]) / length(lambda)
+}
+model2_p <- function(x) model2(loci,x,N0,birthRate,carryingCapacity)
+
+library(parallel)
+n.cores <- detectCores()
+cl <- makeCluster (n.cores)
+clusterExport(cl, c("model2", "loci","N0","birthRate","carryingCapacity","genotypeSim","rHomozygotes","PMFHomozygotes","rmvhyper"),envir=environment())
+survivalSingle <- parLapply (cl, X = freqRange, fun = model2_p)
+stopCluster (cl)
+
 ## model 2 v2
 survivalSingle <- list()
 for (averageMutFreq in freqRange) {
-    lambda <- (genotypeSim(loci, averageMutFreq, N0, birthRate))/N0
+    lambda <- (genotypeSim(loci, averageMutFreq, N0, birthRate, carryingCapacity))/N0
     survivalSingle <- append(survivalSingle, length(lambda[lambda < 1]) / length(lambda))
     print(averageMutFreq)
 }
-plot(freqRange, survivalSingle,col="green",ylim=c(0,1),pch=2,xlab="",ylab="")
+plot(freqRange, survivalSingle,col="black",ylim=c(0,1),pch=2,xlab="",ylab="")
 par(new=TRUE)
+write.csv(data.frame(freqRange,unlist(survivalSingle)),paste("./data/model2_2",as.character(threadI),".csv",sep = ""))
 
 ## model 3
 survivalRecurse <- list()
+
+model3 <- function (x) {
+    outcomeGroup <- recursiveSim(loci,x, N0, birthRate, carryingCapacity)
+    length(outcomeGroup[outcomeGroup == "EXTINCT"]) / length(outcomeGroup)
+}
+
+library(parallel)
+n.cores <- detectCores()
+cl <- makeCluster (n.cores)
+clusterExport(cl, c("model3", "loci","N0","birthRate","carryingCapacity","recursiveSim","rHomozygotes","PMFHomozygotes","rmvhyper","rGeneDrift","PMFGeneDrift"),envir=environment())
+survivalRecurse <- parLapply (cl, X = freqRange, fun = model3)
+stopCluster (cl)
 for (averageMutFreq in freqRange) {
     outcomeGroup <- recursiveSim(loci, averageMutFreq, N0, birthRate, carryingCapacity)
     # fitnessDecreases <- W(loci, mutFreqs, N0)
     survivalRecurse <- append(survivalRecurse, length(outcomeGroup[outcomeGroup == "EXTINCT"]) / length(outcomeGroup))
     print(averageMutFreq)
 }
-write.csv(data.frame(freqRange,unlist(survivalRecurse)),paste("./data/model3_rerun",as.character(threadI),".csv",sep = "")) 
-
 plot(head(freqRange,length(survivalRecurse)), survivalRecurse,col="blue",ylim=c(0,1),xlim=c(0,0.3),pch=2,xlab="",ylab="")
 par(new=TRUE)
+threadI = 1
+write.csv(data.frame(freqRange,unlist(survivalRecurse)),paste("./data/model3_rerun",as.character(threadI),".csv",sep = "")) 
+
+library (parallel)
+lapply (1:100, FUN = function (x) mean (rnorm (1000000)))
+
 
 
 # Pulling slim apart:
@@ -237,9 +269,9 @@ slimData <- read.csv("./data/out_AnalyticalComparison_LIFP_1695296487.csv") %>%
 dataSlice2d.MutationFrequency <- filter(slimData, MutationCount==100, Individuals == 25, GrowthRate == 3)
 plot(extinctionProbability~MutationFrequency,data=filter(dataSlice2d.MutationFrequency),col="black",ylim=c(0,1),xlim=c(0,0.3),xlab="Deleterious Recessive Frequency",ylab="Extinction Probability")
 
-write.csv(data.frame(freqRange,unlist(survivalW)),"./data/model1.csv")
-write.csv(data.frame(freqRange,unlist(survivalSingle)),"./data/model2_2.csv")
+write.csv(data.frame(freqRange,unlist(survivalW)),"./data/model1_6_5_25.csv")
+write.csv(data.frame(freqRange,unlist(survivalSingle)),"./data/model2_6_5_25.csv")
 # write.csv(data.frame(freqRange,unlist(survivalRecurse)),"./data/model3.csv") 
-write.csv(data.frame(freqRange,unlist(survivalRecurse)),"./data/model3_rerun.csv") 
+write.csv(data.frame(freqRange,unlist(survivalRecurse)),"./data/model3_6_5_25.csv") 
 
 write.csv(dataSlice2d.MutationFrequency,"./data/modelslim.csv") 

@@ -1,4 +1,5 @@
 library(dplyr)
+# install.packages("svglite")
 library(svglite)
 # groupedData <- read.csv("./data/out_51093850.csv") %>%
 #   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
@@ -69,8 +70,8 @@ plot(extinctionRate~GrowthRate,data=dataSlice2d.GrowthRate,ylim=c(0,1),ylab="Ext
 
 # # # # # # # # # # # # # # # # # # # # # # # # 
 # Figure 2 graphs
-mc <- 80
-mf <- 0.075
+mc <- 200
+mf <- 0.04
 i <- 25
 gr1 <- 3
 gr2 <- 3.5
@@ -112,10 +113,34 @@ dataSlice2d.MutationFrequency3 <- filter(autosomalGraphData, MutationCount==mc, 
 dataSlice2d.Individuals3 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, GrowthRate == gr3)
 dataSlice2d.GrowthRate3 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, Individuals == i)
 
+# groupedGraphData <- read.csv("./data/out_GraphSlicesAllStandardLinkage_LIFPIC_1747151288.csv") %>%
+# groupedGraphData <- read.csv("./data/out_GraphSlicesAllStandardLinkage400_LIFPIC_1747236301.csv") %>%
+groupedGraphData <- read.csv("./data/out_GraphSlicesAll_LIFPNG_1749575412.csv") %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate) %>% 
+  mutate(count = n()) %>%
+  mutate(extinctionRate = sum(Result == "EXTINCT") / count) %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate, extinctionRate, count) %>% 
+  summarise()
+autosomalGraphData <- filter(groupedGraphData,Xlinked==0,Sterile==0 |Sterile=="F" )
+dataSlice2d.MutationFrequency1 <- filter(autosomalGraphData, MutationCount==mc, Individuals == i, GrowthRate == gr1)
+dataSlice2d.MutationCount1 <- filter(autosomalGraphData, MutationFrequency==mf, Individuals == i, GrowthRate == gr1)
+dataSlice2d.Individuals1 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, GrowthRate == gr1)
+dataSlice2d.GrowthRate1 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, Individuals == i)
+dataSlice2d.MutationFrequency2 <- filter(autosomalGraphData, MutationCount==mc, Individuals == i, GrowthRate == gr2)
+dataSlice2d.MutationCount2 <- filter(autosomalGraphData, MutationFrequency==mf, Individuals == i, GrowthRate == gr2)
+dataSlice2d.Individuals2 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, GrowthRate == gr2)
+dataSlice2d.GrowthRate2 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, Individuals == i)
+dataSlice2d.MutationCount3 <- filter(autosomalGraphData, MutationFrequency==mf, Individuals == i, GrowthRate == gr3)
+dataSlice2d.MutationFrequency3 <- filter(autosomalGraphData, MutationCount==mc, Individuals == i, GrowthRate == gr3)
+dataSlice2d.Individuals3 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, GrowthRate == gr3)
+dataSlice2d.GrowthRate3 <- filter(autosomalGraphData, MutationFrequency==mf, MutationCount==mc, Individuals == i)
 
 
-svglite("figures/figure_2A.svg", width = 5.8, height = 4.35)
-plot(extinctionRate~GrowthRate,data=filter(dataSlice2d.GrowthRate1,GrowthRate!=3,GrowthRate!=3.5,GrowthRate!=4),ylim=c(0,1),xlim=c(2,6),ylab="Extinction probability",xlab="Female reproductive output ",pch=19)
+
+svglite("figures/figure_2A2.svg", width = 5.8, height = 4.35)
+plot(extinctionRate~GrowthRate,data=filter(dataSlice2d.GrowthRate1,GrowthRate!=3,GrowthRate!=3.5,GrowthRate!=4,2<GrowthRate*(1-mf^2)^mc),ylim=c(0,1),xlim=c(2,6),ylab="Extinction probability",xlab="Female reproductive output ",pch=19)
+par(new=TRUE)
+plot(extinctionRate~GrowthRate,data=filter(dataSlice2d.GrowthRate1,GrowthRate!=3,GrowthRate!=3.5,GrowthRate!=4,2>=GrowthRate*(1-mf^2)^mc),ylim=c(0,1),xlim=c(2,6),axes=FALSE,pch=1,ylab="",xlab="")
 par(new=TRUE)
 plot(extinctionRate~GrowthRate,data=filter(dataSlice2d.GrowthRate1,GrowthRate==3),ylim=c(0,1),xlim=c(2,6),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
 par(new=TRUE)
@@ -124,16 +149,26 @@ par(new=TRUE)
 plot(extinctionRate~GrowthRate,data=filter(dataSlice2d.GrowthRate3,GrowthRate==4),ylim=c(0,1),xlim=c(2,6),axes=FALSE,col="#68c24f",pch=19,ylab="",xlab="")
 dev.off()
 
-svglite("figures/figure_2B.svg", width = 5.8, height = 4.35)
-plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency3,ylim=c(0,1),xlim=c(0,0.15),ylab="Extinction probability",xlab="Deleterious recessive frequency",col="#68c24f",pch=19)
+svglite("figures/figure_2B2.svg", width = 5.8, height = 4.35)
+# plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency4,ylim=c(0,1),xlim=c(0,0.15),ylab="Extinction probability",xlab="Deleterious recessive frequency",col="#ff0000",pch=19)
+# par(new=TRUE)
+plot(extinctionRate~MutationFrequency,data=filter(dataSlice2d.MutationFrequency3,2>=gr3*(1-MutationFrequency^2)^mc),ylim=c(0,1),xlim=c(0,0.05),ylab="Extinction probability",xlab="Deleterious recessive frequency",col="#68c24f",pch=1)
 par(new=TRUE)
-plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency2,ylim=c(0,1),xlim=c(0,0.15),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
+plot(extinctionRate~MutationFrequency,data=filter(dataSlice2d.MutationFrequency2,2>=gr2*(1-MutationFrequency^2)^mc),ylim=c(0,1),xlim=c(0,0.05),axes=FALSE,col="#859225",pch=1,ylab="",xlab="")
 par(new=TRUE)
-plot(extinctionRate~MutationFrequency,data=dataSlice2d.MutationFrequency1,ylim=c(0,1),xlim=c(0,0.15),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
-abline(v=0.075,lty=2)
+plot(extinctionRate~MutationFrequency,data=filter(dataSlice2d.MutationFrequency1,2>=gr1*(1-MutationFrequency^2)^mc),ylim=c(0,1),xlim=c(0,0.05),axes=FALSE,col="#81651d",pch=1,ylab="",xlab="")
+par(new=TRUE)
+plot(extinctionRate~MutationFrequency,data=filter(dataSlice2d.MutationFrequency3,2<gr3*(1-MutationFrequency^2)^mc),ylim=c(0,1),xlim=c(0,0.05),axes=FALSE,col="#68c24f",pch=19,ylab="",xlab="")
+par(new=TRUE)
+plot(extinctionRate~MutationFrequency,data=filter(dataSlice2d.MutationFrequency2,2<gr2*(1-MutationFrequency^2)^mc),ylim=c(0,1),xlim=c(0,0.05),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
+par(new=TRUE)
+plot(extinctionRate~MutationFrequency,data=filter(dataSlice2d.MutationFrequency1,2<gr1*(1-MutationFrequency^2)^mc),ylim=c(0,1),xlim=c(0,0.05),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
+abline(v=0.03,lty=2)
 dev.off()
 
-svglite("figures/figure_2C.svg", width = 5.8, height = 4.35)
+svglite("figures/figure_2C2.svg", width = 5.8, height = 4.35)
+# plot(extinctionRate~Individuals,data=dataSlice2d.Individuals4,ylim=c(0,1),xlim=c(0,0.15),ylab="Extinction probability",xlab="Deleterious recessive frequency",col="#68c24f",pch=19)
+# par(new=TRUE)
 plot(extinctionRate~Individuals,data=dataSlice2d.Individuals3,ylim=c(0,1),xlim=c(0,120),ylab="Extinction probability",xlab="Founding population size",col="#68c24f",pch=19)
 par(new=TRUE)
 plot(extinctionRate~Individuals,data=dataSlice2d.Individuals2,ylim=c(0,1),xlim=c(0,120),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
@@ -142,13 +177,19 @@ plot(extinctionRate~Individuals,data=dataSlice2d.Individuals1,ylim=c(0,1),xlim=c
 abline(v=25,lty=2)
 dev.off()
 
-svglite("figures/figure_2D.svg", width = 5.8, height = 4.35)
-plot(extinctionRate~MutationCount,data=dataSlice2d.MutationCount3,ylim=c(0,1),xlim=c(0,150),ylab="Extinction probability",xlab="Deleterious loci count",col="#68c24f",pch=19)
+svglite("figures/figure_2D2.svg", width = 5.8, height = 4.35)
+plot(extinctionRate~MutationCount,data=filter(dataSlice2d.MutationCount3,2>=gr3*(1-mf^2)^MutationCount),ylim=c(0,1),xlim=c(0,450),ylab="Extinction probability",xlab="Deleterious loci count",col="#68c24f",pch=1)
 par(new=TRUE)
-plot(extinctionRate~MutationCount,data=dataSlice2d.MutationCount2,ylim=c(0,1),xlim=c(0,150),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
+plot(extinctionRate~MutationCount,data=filter(dataSlice2d.MutationCount2,2>=gr2*(1-mf^2)^MutationCount),ylim=c(0,1),xlim=c(0,450),axes=FALSE,col="#859225",pch=1,ylab="",xlab="")
 par(new=TRUE)
-plot(extinctionRate~MutationCount,data=dataSlice2d.MutationCount1,ylim=c(0,1),xlim=c(0,150),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
-abline(v=80,lty=2)
+plot(extinctionRate~MutationCount,data=filter(dataSlice2d.MutationCount1,2>=gr1*(1-mf^2)^MutationCount),ylim=c(0,1),xlim=c(0,450),axes=FALSE,col="#81651d",pch=1,ylab="",xlab="")
+par(new=TRUE)
+plot(extinctionRate~MutationCount,data=filter(dataSlice2d.MutationCount3,2<gr3*(1-mf^2)^MutationCount),ylim=c(0,1),xlim=c(0,450),axes=FALSE,ylab="",xlab="",col="#68c24f",pch=19)
+par(new=TRUE)
+plot(extinctionRate~MutationCount,data=filter(dataSlice2d.MutationCount2,2<gr2*(1-mf^2)^MutationCount),ylim=c(0,1),xlim=c(0,450),axes=FALSE,col="#859225",pch=19,ylab="",xlab="")
+par(new=TRUE)
+plot(extinctionRate~MutationCount,data=filter(dataSlice2d.MutationCount1,2<gr1*(1-mf^2)^MutationCount),ylim=c(0,1),xlim=c(0,450),axes=FALSE,col="#81651d",pch=19,ylab="",xlab="")
+abline(v=400,lty=2)
 dev.off()
 
 
