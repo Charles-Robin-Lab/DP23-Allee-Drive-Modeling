@@ -7,12 +7,12 @@ library(dplyr)
 library(scales)
 library(gridExtra)
 
-recombinationComparisonData <- read.csv("./data/out_Recombination_LIFPIC_1747152563.csv  ") %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate) %>% 
+recombinationComparisonData <- read.csv("./data/out_Recombination_LIFPNG_1750177457.csv") %>%
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, PostCompetitionMutationTiming, RecombinationRate) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED" ) / count) %>%
   mutate(loadSurvivalRate = sum(Result == "LOADED_SURVIVAL") / count) %>%
-  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate, survivalRate, loadSurvivalRate,count) %>% 
+  group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, PostCompetitionMutationTiming, RecombinationRate, survivalRate, loadSurvivalRate,count) %>% 
   summarise()
 
 
@@ -32,9 +32,9 @@ recombinationComparisonData <- read.csv("./data/out_Recombination_LIFPIC_1747152
 # plot(survivalRate~RecombinationRate,data=filter(recombinationComparisonData, Xlinked==1),pch = 2,ylim=c(0,1),log="x")
 
 
- 
+
 # create data
-autosomalRecombinationComparisonData<- filter(recombinationComparisonData, Xlinked==0, Sterile==0)
+autosomalRecombinationComparisonData<- filter(recombinationComparisonData, Xlinked==0, Sterile==0, PostCompetitionMutationTiming==0,GrowthRate==3.0)
 RecombinationRate <- rep(autosomalRecombinationComparisonData$RecombinationRate,times=3)
 outcomeProportion <- c(1-autosomalRecombinationComparisonData$survivalRate - autosomalRecombinationComparisonData$loadSurvivalRate,autosomalRecombinationComparisonData$loadSurvivalRate,autosomalRecombinationComparisonData$survivalRate)
 outcomeGroup <- rep(c("Extinction","Pseudo-overdominance survival","Carrying capacity reached"),each=length(autosomalRecombinationComparisonData$RecombinationRate))
@@ -46,7 +46,7 @@ data$outcomeGroup <- factor(data$outcomeGroup, c("Carrying capacity reached","Ps
 outcomeProportion[autosomalRecombinationComparisonData$RecombinationRate==0]
 # stacked area chart
 
-svglite("figures/figure_4.svg", width = 8.2, height = 5.5)
+svglite("figures/figure_4_2.svg", width = 8.2, height = 5.5)
 ggplot(data,log="x", aes(x=RecombinationRate, y=outcomeProportion, fill=outcomeGroup)) + 
     geom_area() +
     scale_x_continuous(trans='log10',limits = c(min(RecombinationRate[RecombinationRate!=0]), max(RecombinationRate)),
@@ -66,7 +66,7 @@ require(pracma)
 
 # Looking at where unlinked extinction is lower than linked extinction
 
-recombinationParameterSpaceData <- read.csv("./data/out_LociSpaceComparison_LLP_1701400090.csv") %>%
+recombinationParameterSpaceData <- read.csv("./data/out_LociSpaceComparison_LIFPNG_1750176677.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, RecombinationRate, ChromosomeCount) %>% 
   mutate(count = n()) %>%
   mutate(survivalRate = sum(Result == "SURVIVED" ) / count) %>%
@@ -76,16 +76,16 @@ recombinationParameterSpaceData <- read.csv("./data/out_LociSpaceComparison_LLP_
 
 # create data
 slices = list()
-spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.1,GrowthRate==3,MutationCount==100)
+spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.083,GrowthRate==4,MutationCount==100)
 slices[[1]] = spaceSlice
-spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.1,GrowthRate==3,MutationCount==70)
+spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.099,GrowthRate==4,MutationCount==70)
 slices[[2]] = spaceSlice
-spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.15,GrowthRate==3,MutationCount==40)
+spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.131,GrowthRate==4,MutationCount==40)
 slices[[3]] = spaceSlice
-spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.2,GrowthRate==3,MutationCount==25)
+# spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.2,GrowthRate==3,MutationCount==25)
+spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.259,GrowthRate==4,MutationCount==10)
 slices[[4]] = spaceSlice
-spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.4,GrowthRate==3,MutationCount==10)
-slices[[5]] = spaceSlice
+# slices[[5]] = spaceSlice
 for (spaceSlice in slices) {
   freq = spaceSlice$MutationFrequency[1]
   lociCount = spaceSlice$MutationCount[1]
@@ -97,24 +97,24 @@ for (spaceSlice in slices) {
   data <- data.frame(individuals, outcomeProportion, outcomeGroup)
   print("linked")
   df <- filter(data,outcomeGroup=="Extinction")
-  print(trapz(df$individuals,df$outcomeProportion)/0.9)
+  print(trapz(df$individuals,df$outcomeProportion)/0.9) # 0.9 is the area of the space
   df <- filter(data,outcomeGroup=="Loaded survival")
   print(trapz(df$individuals,df$outcomeProportion)/0.9)
   df <- filter(data,outcomeGroup=="Survival")
   print(trapz(df$individuals,df$outcomeProportion)/0.9)
 
 
-  print(ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) + 
-      # ggtitle(sprintf("Freq %f , loci %d",freq,lociCount)) +
+  # print(ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) + 
+  #     # ggtitle(sprintf("Freq %f , loci %d",freq,lociCount)) +
       
-      theme_void() +
-      theme(panel.background = element_blank()) +
-      scale_x_continuous(breaks = round(seq(min(individuals), max(individuals), by = 15),1)) +
-      xlab("Individuals") + theme(legend.position = "none") + 
-      ylab("Outcome proportion") +
-      geom_area() + guides(fill=guide_legend(title="Outcome group")) +
-      annotate("text", x=20, y=0.875, label= round(AUC,2))
-      )
+  #     theme_void() +
+  #     theme(panel.background = element_blank()) +
+  #     scale_x_continuous(breaks = round(seq(min(individuals), max(individuals), by = 15),1)) +
+  #     xlab("Individuals") + theme(legend.position = "none") + 
+  #     ylab("Outcome proportion") +
+  #     geom_area() + guides(fill=guide_legend(title="Outcome group")) +
+  #     annotate("text", x=20, y=0.875, label= round(AUC,2))
+  #     )
 
   unlinkedData <- filter(spaceSlice,ChromosomeCount!=1)
   individuals <- rep(unlinkedData$Individuals,times=3)
@@ -128,37 +128,35 @@ for (spaceSlice in slices) {
   print(trapz(df$individuals,df$outcomeProportion)/0.9)
   df <- filter(data,outcomeGroup=="Survival")
   print(trapz(df$individuals,df$outcomeProportion)/0.9)
-  print(ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) + 
-      # ggtitle(sprintf("Freq %f , loci %d",freq,lociCount)) +
-      theme_void() +
-      theme(panel.background = element_blank()) +
-      scale_x_continuous(breaks = round(seq(min(individuals), max(individuals), by = 15),1)) +
-      theme(legend.position = "none") + 
-      xlab("Individuals") + 
-      ylab("Outcome proportion") +
-      guides(fill=guide_legend(title="Outcome group")) +
-      geom_area() + 
-      annotate("text", x=20, y=0.875, label= round(AUC,2))
-      )
+  # print(ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) + 
+  #     # ggtitle(sprintf("Freq %f , loci %d",freq,lociCount)) +
+  #     theme_void() +
+  #     theme(panel.background = element_blank()) +
+  #     scale_x_continuous(breaks = round(seq(min(individuals), max(individuals), by = 15),1)) +
+  #     theme(legend.position = "none") + 
+  #     xlab("Individuals") + 
+  #     ylab("Outcome proportion") +
+  #     guides(fill=guide_legend(title="Outcome group")) +
+  #     geom_area() + 
+  #     annotate("text", x=20, y=0.875, label= round(AUC,2))
+  #     )
 }
 
 # install.packages("tidyverse")
 
 library(tidyverse)
-spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.1,MutationCount==100)
-spaceSlices <- rbind(spaceSlice,filter(recombinationParameterSpaceData,MutationFrequency==0.1,MutationCount==70))
-spaceSlices <- rbind(spaceSlices,filter(recombinationParameterSpaceData,MutationFrequency==0.15,MutationCount==55))
-spaceSlices <- rbind(spaceSlices,filter(recombinationParameterSpaceData,MutationFrequency==0.15,MutationCount==40))
-spaceSlices <- rbind(spaceSlices,filter(recombinationParameterSpaceData,MutationFrequency==0.2,MutationCount==25))
-spaceSlices <- rbind(spaceSlices,filter(recombinationParameterSpaceData,MutationFrequency==0.4,MutationCount==10))
+spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.083,MutationCount==100)
+spaceSlices <- rbind(spaceSlice,filter(recombinationParameterSpaceData,MutationFrequency==0.099,MutationCount==70))
+spaceSlices <- rbind(spaceSlices,filter(recombinationParameterSpaceData,MutationFrequency==0.131,MutationCount==40))
+spaceSlices <- rbind(spaceSlices,filter(recombinationParameterSpaceData,MutationFrequency==0.259,MutationCount==10))
 
-spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.1,MutationCount==100)
-spaceSlices <- rbind(spaceSlice,filter(recombinationParameterSpaceData,MutationFrequency==0.1,MutationCount==70))
-spaceSlices <- rbind(spaceSlices,filter(recombinationParameterSpaceData,MutationFrequency==0.15,MutationCount==40))
-spaceSlices <- rbind(spaceSlices,filter(recombinationParameterSpaceData,MutationFrequency==0.4,MutationCount==10))
+# spaceSlice <- filter(recombinationParameterSpaceData,MutationFrequency==0.1,MutationCount==100)
+# spaceSlices <- rbind(spaceSlice,filter(recombinationParameterSpaceData,MutationFrequency==0.1,MutationCount==70))
+# spaceSlices <- rbind(spaceSlices,filter(recombinationParameterSpaceData,MutationFrequency==0.15,MutationCount==40))
+# spaceSlices <- rbind(spaceSlices,filter(recombinationParameterSpaceData,MutationFrequency==0.4,MutationCount==10))
 
 
-slice <- filter(spaceSlices,GrowthRate==3)
+slice <- filter(spaceSlices,GrowthRate==3.5)
 individuals <- rep(slice$Individuals,times=3)
 loci <- factor(rep(slice$MutationCount,times=3))
 freq <- rep(slice$MutationFrequency,times=3)
@@ -183,7 +181,7 @@ data$outcomeGroup <- factor(data$outcomeGroup, sort(unique(data$outcomeGroup), d
 #       geom_area() + guides(fill=guide_legend(title="Outcome group"))+
 #       facet_grid(vars(load), vars(linked)) 
 
-svglite("figures/figure_S4.svg", width = 4.1, height = 5.5)
+svglite("figures/figure_S42.svg", width = 4.1, height = 5.5)
 
 ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) + 
       # ggtitle(sprintf("Freq %f , loci %d",freq,lociCount)) +
@@ -194,7 +192,7 @@ ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) +
       ylab("Outcome proportion") +
       scale_fill_manual(values = c("#619CFF", "#00BA38", "#F8766D")) +
       geom_area() + 
-      geom_text(data = ann_text,label = "Text") +
+      # geom_text(data = ann_text,label = "Text") +
       guides(fill=guide_legend(title="Outcome group"))+
       facet_grid(vars(fct_rev(loci),freq), vars(linked))
 dev.off()

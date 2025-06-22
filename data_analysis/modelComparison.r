@@ -2,22 +2,17 @@
 library(svglite)
 library(ggplot2)
 library(dplyr)
-survivalW <- read.csv("./data/4_14052025_model1.csv")$unlist.survivalW.
-survivalSingle <- read.csv("./data/4_14052025_model2.csv")$unlist.survivalSingle.
-# survivalRecurse <- read.csv("./data/analytical_model3.csv")$unlist.survivalRecurse.
-survivalRecurse <- read.csv("./data/4_14052025_model3.csv")$unlist.survivalRecurse.
 
 
-survivalW <- read.table("./data/8_18052025_model1.csv", header = FALSE, sep=",") %>%
+survivalW <- read.table("./data/finalish1.5_21062025_model1.csv", header = FALSE, sep=",") %>%
   rename(MutationFrequency=V2, MutationCount=V1, Individuals=V3, GrowthRate=V4,Result=V5) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate) %>% 
   mutate(count = n()) %>%
   mutate(extinctionProbability = sum(Result == "EXTINCT") / count) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, extinctionProbability, count) %>% 
   summarise()
-dataSlice2d.MutationFrequency <- filter(slimData, MutationCount==400, Individuals == 25, GrowthRate == 3)
   
-survivalSingle <- read.table("./data/8_18052025_model2.csv", header = FALSE, sep=",") %>%
+survivalSingle <- read.table("./data/finalish1.5_21062025_model2.csv", header = FALSE, sep=",") %>%
   rename(MutationFrequency=V2, MutationCount=V1, Individuals=V3, GrowthRate=V4,Result=V5) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate) %>% 
   mutate(count = n()) %>%
@@ -26,7 +21,7 @@ survivalSingle <- read.table("./data/8_18052025_model2.csv", header = FALSE, sep
   summarise()
 
 
-survivalRecurse <- read.table("./data/8_18052025_model3.csv", header = FALSE, sep=",") %>%
+survivalRecurse <- read.table("./data/finalish1.5_21062025_model3.csv", header = FALSE, sep=",") %>%
   rename(MutationFrequency=V2, MutationCount=V1, Individuals=V3, GrowthRate=V4,Result=V5) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate) %>% 
   mutate(count = n()) %>%
@@ -34,7 +29,7 @@ survivalRecurse <- read.table("./data/8_18052025_model3.csv", header = FALSE, se
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, extinctionProbability, count) %>% 
   summarise()
 
-slimData <- read.csv("./data/out_AnalyticalComparison2_LIFPIC_1747574381.csv") %>%
+slimData <- read.csv("./data/out_AnalyticalComparison_LIFPNG_1750435735.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate) %>% 
   mutate(count = n()) %>%
   mutate(extinctionProbability = sum(Result == "EXTINCT") / count) %>%
@@ -42,8 +37,8 @@ slimData <- read.csv("./data/out_AnalyticalComparison2_LIFPIC_1747574381.csv") %
   summarise()
 
 mc<-200
-q<-0.045
-gr<-3
+q<-0.04
+gr<-1.5
 i<-25
 depFreq <- function(x) {filter(x, MutationCount==mc, Individuals == i, GrowthRate == gr)}
 depLoci <- function(x) {filter(x, MutationFrequency==q, Individuals == i, GrowthRate == gr)}
@@ -68,7 +63,7 @@ depInds <- function(x) {filter(x, MutationCount==mc, MutationFrequency==q, Growt
 
 # freqRange <- slimData$MutationFrequency
 # svglite("figures/figure_1.2_1747151880.svg", width = 8, height = 6)
-dev.off()
+# dev.off()
 
 funcrange<-list(depFreq,c(0.0,0.1))
 
@@ -101,7 +96,7 @@ par(new=TRUE)
 plot(extinctionProbability~Individuals,data=funcrange[[1]](slimData),col="black",ylim=c(0,1),xlim=funcrange[[2]],xlab="Individual count",ylab="Extinction probability")
 
 
-funcrange<-list(depGrowth,c(1.0,4.0))
+funcrange<-list(depGrowth,c(1.0,2.0))
 plot(extinctionProbability~GrowthRate,data=funcrange[[1]](survivalW),col="red",ylim=c(0,1),xlim=funcrange[[2]],pch=2,xlab="",ylab="",axes = FALSE)
 par(new=TRUE)
 plot(extinctionProbability~GrowthRate,data=funcrange[[1]](survivalSingle),col="green",ylim=c(0,1),xlim=funcrange[[2]],pch=2,xlab="",ylab="",axes = FALSE)
