@@ -8,7 +8,7 @@ dataset0<- "./data/out_bestParameterSpaceFirstQuarter_LIFPNG_1752545199.csv"
 dataset1<- "./data/out_bestParameterSpaceSecondQuarter_LIFPNG_1752545204.csv"
 dataset2<- "./data/out_bestParameterSpaceFourthQuarter_LIFPNG_1752545194.csv"
 dataset3<- "./data/out_bestParameterSpaceThirdQuarter_LIFPNG_1752545209.csv"
-outputfile<- "E:/out_bestParameterSpace_LIFPNG_1752545194.csv"
+outputfile<- "./data/out_bestParameterSpace_LIFPNG_1752545194.csv"
 
 groupedGraphData <- bind_rows(read.csv(dataset0),read.csv(dataset1),read.csv(dataset2),read.csv(dataset3)) %>%
     group_by(

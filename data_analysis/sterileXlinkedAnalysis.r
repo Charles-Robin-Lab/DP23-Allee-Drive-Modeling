@@ -21,18 +21,8 @@ diffBin<-function(z, n1, p1, n2, p2){
   }
   return(prob)
 }
-simulatedDataset <- "E:/out_bestParameterSpace_LIFPNG_1752545194.csv"
+simulatedDataset <- "./data/out_bestParameterSpace_LIFPNG_1752545194.csv"
 dataset <- read.csv(simulatedDataset)
-
-
-# paramaterSpace <- dataset %>%
-#   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, PostCompetitionMutationTiming) %>% 
-#   mutate(count = n()) %>%
-#   mutate(extinctionRate = sum(Result == "EXTINCT") / count) %>%
-#   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, extinctionRate, count) %>%
-#   # filter(2/GrowthRate <=(1-MutationFrequency^2)^MutationCount) %>%
-#   arrange(extinctionRate) %>%
-#   summarise()
 
 
 unfilteredXTestData <-  dataset %>% 
@@ -83,23 +73,13 @@ print(colMeans(xlower), digits = 4)
 print(colMeans(xhigher), digits = 4)
 
 
-# s2<-hist(xlinkedDiffs,breaks = seq(from=-1.00125, to=1.00125, by=0.0025),plot=FALSE)$mids
-# y2<-hist(xlinkedDiffs,breaks = seq(from=-1.00125, to=1.00125, by=0.0025),plot=FALSE)$counts
-
-# pcol<- mapply(function(x, p) {
-#   dbinom(x, size=length(xlinkedDiffs), prob=p) 
-# }, y2, y1/length(xlinkedDiffs))
-
-# pthresh <- 1-(1-0.05)^(1/sum(y2!=0))
-# sigcols <- s2[pcol <pthresh]
-
-
-nsamples <- 400
-s1<-(-nsamples):nsamples
-p1 <- xtestData[xtestData$Xlinked==1,]$expectedExtinctionRate
-y1<-sapply(s1, function(x) sum(diffBin(x, nsamples, p1, nsamples, p1)))
-write.csv(data.frame(s1,y1),"./data/expectedNullXlinkedAutosomalDiff.csv")
-
+if (!file.exists("./data/expectedNullXlinkedAutosomalDiff.csv")) {
+  nsamples <- 400
+  s1<-(-nsamples):nsamples
+  p1 <- xtestData[xtestData$Xlinked==1,]$expectedExtinctionRate
+  y1<-sapply(s1, function(x) sum(diffBin(x, nsamples, p1, nsamples, p1)))
+  write.csv(data.frame(s1,y1),"./data/expectedNullXlinkedAutosomalDiff.csv")
+}
 
 s1 <- read.csv('./data/expectedNullXlinkedAutosomalDiff.csv')$s1
 y1 <- read.csv('./data/expectedNullXlinkedAutosomalDiff.csv')$y1
@@ -122,14 +102,11 @@ svglite("figures/figure_5A.svg", width = 13*dotpointscale, height = 10*dotpoints
 par(mar=c(5,4,2,2)+0.1)
 hist(xlinkedDiffs,ylim=c(0,1000),xlim=c(-0.275,0.275),breaks = seq(from=-0.40125, to=0.40125, by=0.0025),main=NULL,xlab="Difference in extinction rates between xlinked and autosomal datapoints",axes=FALSE)
 par(new=TRUE)
-# hist(xlinkedDiffs[!(round(xlinkedDiffs,4) %in% round(sigcols,4))],col="green",ylim=c(0,200),xlim=c(-0.25,0.25),breaks = seq(from=-0.40125, to=0.40125, by=0.0025),main=NULL,xlab="Difference in extinction rates between xlinked and autosomal datapoints",axes=FALSE)
-# par(new=TRUE)
 arrows((s1/nsamples)[qcoltop!=0], qcolbot[qcoltop!=0], (s1/nsamples)[qcoltop!=0], qcoltop[qcoltop!=0],col="#665757", lwd =0.75, length=0.010, angle=90, code=3)
 par(new=TRUE)
 hist(2*(xlower$extinctionRate - xlower$expectedExtinctionRate),ylim=c(0,1000),xlim=c(-0.275,0.275),col="red",breaks = seq(from=-0.40125, to=0.40125, by=0.0025),main=NULL,axes=FALSE,xlab='',ylab='')
 par(new=TRUE)
 hist(2*(xhigher$extinctionRate - xhigher$expectedExtinctionRate),ylim=c(0,1000),xlim=c(-0.275,0.275),col="red",breaks = seq(from=-0.40125, to=0.40125, by=0.0025),main=NULL,xaxt="n",xlab='',ylab='')
-# plot(s1/nsamples,y1,ylim=c(0,200),xlim=c(-0.25,0.25),xlab='',ylab='',xaxp=c(-0.25, 0.25, 10),cex=dotpointscale/2, lwd =0.75)
 ticks <- seq(-0.27, 0.27, by = 0.01)
 axis(1, at = ticks, labels = FALSE, tck = -0.01) 
 labels <- seq(-0.25, 0.25, by = 0.05)
@@ -137,21 +114,6 @@ axis(1, at = labels, labels = labels, tck = -0.02)
 dev.off()
 
 
-
-
-# svglite("figures/figure_S4B.svg", width = 10, height = 10)
-# hist(xlinkedRisk[xlinkedRisk<=1000],xlim=c(0.125,4),log='x',breaks = 10^seq(from=-0.73, to=0.55, by=0.01),ylim=c(0,6),main=NULL,xlab="Risk ratio of extinction given xlinked instead of autosomal",xaxt='n')
-# abline(v = 1,col='#f55b02')
-# ticks_at =c(2^seq(from=-2, to=8, by=1),400)
-# axis(side=1, at=ticks_at, labels=ticks_at)
-# dev.off()
-
-# svglite("figures/figure_5A-big-Risk.svg", width = 13*dotpointscale, height = 10*dotpointscale)
-# par(mar=c(5,4,2,2)+0.1)
-# hist(xlinkedRisk,ylim=c(0,200),xlim=c(-0.25,0.25),breaks = seq(from=-0.40125, to=0.40125, by=0.0025),main=NULL,xlab="Difference in extinction rates between xlinked and autosomal datapoints",axes=FALSE)
-# dev.off()
-
-# filter(GrowthRate < 6) %>% #%>%
 
 unfilteredSterileTestData <- dataset %>%  
   filter(PostCompetitionMutationTiming==0) %>%
@@ -172,7 +134,6 @@ steriletestData <- unfilteredSterileTestData  %>%
 
 sum(steriletestData$count)/nrow(unfilteredSterileTestData)
 
-# sterileDiffs <- steriletestData[steriletestData$PostCompetitionMutationTiming==1,]$extinctionRate-steriletestData[steriletestData$PostCompetitionMutationTiming==0,]$extinctionRate
 sterileDiffs <- steriletestData[steriletestData$Sterile==1,]$extinctionRate-steriletestData[steriletestData$Sterile==0,]$extinctionRate
 sterileRisk <- steriletestData[steriletestData$Sterile==1,]$extinctionRate/steriletestData[steriletestData$Sterile==0,]$extinctionRate
 sterileLogitDiff <- log(steriletestData[steriletestData$Sterile==1,]$extinctionRate/(1-steriletestData[steriletestData$Sterile==1,]$extinctionRate)) - 
@@ -198,22 +159,20 @@ pthresh <- 1-(1-0.05)^(1/length(p))
 print(pthresh)
 sterilelower <- steriletestData[steriletestData$Sterile==1,][p <pthresh & sterileislowertail,]
 sterilehigher <- steriletestData[steriletestData$Sterile==1,][p <pthresh & !sterileislowertail,]
-# print(colMeans(steriletestData), digits = 4)
-# print(colMeans(sterilelower), digits = 4)
-# print(colMeans(sterilehigher), digits = 4)
 
 
-nsamples <- 400
-s<-(-nsamples):nsamples
-p <- steriletestData[steriletestData$Sterile==1,]$expectedExtinctionRate
-y<-sapply(s, function(x) sum(diffBin(x, nsamples, p, nsamples, p)))
-write.csv(data.frame(s,y),"./data/expectedNullPrePostLethalDiff.csv")
+if (!file.exists("./data/expectedNullSterileLethalDiff.csv")) {
+  nsamples <- 400
+  s<-(-nsamples):nsamples
+  p <- steriletestData[steriletestData$Sterile==1,]$expectedExtinctionRate
+  y<-sapply(s, function(x) sum(diffBin(x, nsamples, p, nsamples, p)))
+  write.csv(data.frame(s,y),"./data/expectedNullSterileLethalDiff.csv")
+}
 
-# s <- read.csv('./data/expectedNullSterileLethalDiff.csv')$s
-# y <- read.csv('./data/expectedNullSterileLethalDiff.csv')$y
+s <- read.csv('./data/expectedNullSterileLethalDiff.csv')$s
+y <- read.csv('./data/expectedNullSterileLethalDiff.csv')$y
 mean(sterileDiffs)
 sterileLessData <- subset(steriletestData[steriletestData$Sterile==1,], select = -c(Sterile, expectedExtinctionRate))
-# sterileLessData <- subset(steriletestData[steriletestData$PostCompetitionMutationTiming==1,], select = -c(Sterile, expectedExtinctionRate))
 cor(sterileDiffs,sterileLessData)
 sum(y) / sum(table(sterileDiffs)) 
 
@@ -236,20 +195,8 @@ par(new=TRUE)
 hist(2*(sterilelower$extinctionRate - sterilelower$expectedExtinctionRate),ylim=c(0,1000),xlim=c(-0.1,1.0),col="red",lwd =0.1,breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,axes=FALSE,xlab='',ylab='')
 par(new=TRUE)
 hist(2*(sterilehigher$extinctionRate - sterilehigher$expectedExtinctionRate),ylim=c(0,1000),xlim=c(-0.1,1.0),col="red",breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,xaxp=c(-0.2, 1.0, 12),xlab='',ylab='')
-# par(new=TRUE)
-# plot(s/nsamples,y,ylim=c(0,200),xlim=c(-0.1,1.0),xlab='',ylab='',xaxp=c(-0.2, 1.0, 12),cex=dotpointscale/4)
 arrows((s/nsamples)[qcoltop!=0], qcolbot[qcoltop!=0], (s/nsamples)[qcoltop!=0], qcoltop[qcoltop!=0],col="#665757", lwd =0.75, length=0.010, angle=90, code=3)
 dev.off()
-
-# svglite("figures/figure_5B2-big.svg", width = 13*dotpointscale, height = 10*dotpointscale)
-# par(mar=c(5,4,2,2)+0.1)
-# hist(sterileRisk[sterileRisk!=Inf],ylim=c(0,200),xlim=c(-0.5,100),breaks = seq(from=0, to=370, by=1),main=NULL,xlab="Difference in extinction rates between sterile and lethal datapoints")
-# dev.off()
-# svglite("figures/figure_5B3-big.svg", width = 13*dotpointscale, height = 10*dotpointscale)
-# par(mar=c(5,4,2,2)+0.1)
-# hist(sterileLogitDiff[sterileLogitDiff!=Inf],ylim=c(0,150),xlim=c(-2.0,10.0),breaks = seq(from=-10.0025, to=20.025, by=0.05),main=NULL,xlab="Difference in logit extinction rates between sterile and lethal datapoints")
-# dev.off()
-# hist(sterileRisk,ylim=c(0,600),xlim=c(-0.2,1.0),breaks = seq(from=-1.005, to=0.905, by=0.01),main=NULL,xlab="Difference in extinction rates between sterile and lethal datapoints",axes=FALSE)
 
 cor(sterileRisk,sterileLessData)
 range(sterileRisk[sterileRisk!=Inf])
@@ -274,8 +221,6 @@ unfilteredTimingTestData <- dataset %>%
   
   
 timingTestData <- unfilteredTimingTestData  %>% 
-  # filter(GrowthRate<6) %>%
-  # filter(2<GrowthRate*(1-MutationFrequency^2)^MutationCount)%>%
   filter(expectedExtinctionRate<0.975,expectedExtinctionRate>0.025) %>%
   ungroup()  %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, PostCompetitionMutationTiming, expectedExtinctionRate) %>% 
@@ -338,12 +283,13 @@ sterileTiminghigher <- timingTestData[timingTestData$PostCompetitionMutationTimi
 all((timingTestData[timingTestData$PostCompetitionMutationTiming==1 & timingTestData$Sterile==1,]$GrowthRate-timingTestData[timingTestData$PostCompetitionMutationTiming==0 & timingTestData$Sterile==1,]$GrowthRate) ==0)
 
 
-# nsamples <- 400
-# s<-(-nsamples):nsamples
-# p <- timingTestData[timingTestData$PostCompetitionMutationTiming==1 & timingTestData$Sterile==0 ,]$expectedExtinctionRate
-# y<-sapply(s, function(x) sum(diffBin(x, nsamples, p, nsamples, p)))
-# write.csv(data.frame(s,y),"./data/expectedNullPrePostLethalDiff.csv")
-
+if (!file.exists("./data/expectedNullPrePostLethalDiff.csv")) {
+  nsamples <- 400
+  s<-(-nsamples):nsamples
+  p <- timingTestData[timingTestData$PostCompetitionMutationTiming==1 & timingTestData$Sterile==0 ,]$expectedExtinctionRate
+  y<-sapply(s, function(x) sum(diffBin(x, nsamples, p, nsamples, p)))
+  write.csv(data.frame(s,y),"./data/expectedNullPrePostLethalDiff.csv")
+}
 
 s <- read.csv('./data/expectedNullPrePostLethalDiff.csv')$s
 y <- read.csv('./data/expectedNullPrePostLethalDiff.csv')$y
@@ -367,15 +313,16 @@ hist(2*(lethalTiminglower$extinctionRate - lethalTiminglower$expectedExtinctionR
 par(new=TRUE)
 hist(2*(lethalTiminghigher$extinctionRate - lethalTiminghigher$expectedExtinctionRate),ylim=c(0,1000),xlim=c(-0.1,0.4),col="red",breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,xaxp=c(-0.2, 1.0, 12),xlab='',ylab='')
 arrows((s/nsamples)[qcoltop!=0], qcolbot[qcoltop!=0], (s/nsamples)[qcoltop!=0], qcoltop[qcoltop!=0],col="#665757", lwd =0.75, length=0.010, angle=90, code=3)
-# plot(s/nsamples,y,ylim=c(0,200),xlim=c(-0.1,0.4),xlab='',ylab='',xaxp=c(-0.2, 1.0, 12),cex=dotpointscale/2)
 dev.off()
 
 
-# nsamples <- 400
-# s<-(-nsamples):nsamples
-# p <- timingTestData[timingTestData$PostCompetitionMutationTiming==1 & timingTestData$Sterile==1 ,]$expectedExtinctionRate
-# y<-sapply(s, function(x) sum(diffBin(x, nsamples, p, nsamples, p)))
-# write.csv(data.frame(s,y),"./data/expectedNullPrePostSterileDiff.csv")
+if (!file.exists("./data/expectedNullPrePostSterileDiff.csv")) {
+  nsamples <- 400
+  s<-(-nsamples):nsamples
+  p <- timingTestData[timingTestData$PostCompetitionMutationTiming==1 & timingTestData$Sterile==1 ,]$expectedExtinctionRate
+  y<-sapply(s, function(x) sum(diffBin(x, nsamples, p, nsamples, p)))
+  write.csv(data.frame(s,y),"./data/expectedNullPrePostSterileDiff.csv")
+}
 
 
 s <- read.csv('./data/expectedNullPrePostSterileDiff.csv')$s
@@ -399,5 +346,4 @@ hist(2*(sterileTiminglower$extinctionRate - sterileTiminglower$expectedExtinctio
 par(new=TRUE)
 hist(2*(sterileTiminghigher$extinctionRate - sterileTiminghigher$expectedExtinctionRate),ylim=c(0,1000),xlim=c(-0.1,1.0),col="red",breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,xaxp=c(-0.2, 1.0, 12),xlab='',ylab='')
 arrows((s/nsamples)[qcoltop!=0], qcolbot[qcoltop!=0], (s/nsamples)[qcoltop!=0], qcoltop[qcoltop!=0],col="#665757", lwd =0.75, length=0.010, angle=90, code=3)
-# plot(s/nsamples,y,ylim=c(0,200),xlim=c(-0.1,1.0),xlab='',ylab='',xaxp=c(-0.2, 1.0, 12),cex=dotpointscale/4)
 dev.off()

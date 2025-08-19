@@ -20,7 +20,6 @@ survivalSingle <- read.table("./data/finalishstochasticround_23062025_model2.csv
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, extinctionRate, count) %>% 
   summarise()
 
-
 survivalRecurse <- read.table("./data/finalishstochasticround_23062025_model3.csv", header = FALSE, sep=",") %>%
   rename(MutationFrequency=V2, MutationCount=V1, Individuals=V3, GrowthRate=V4,Result=V5) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate) %>% 
@@ -45,27 +44,8 @@ depLoci <- function(x) {filter(x, MutationFrequency==q, Individuals == i, Growth
 depGrowth <- function(x) {filter(x, MutationCount==mc, MutationFrequency==q, Individuals == i)}
 depInds <- function(x) {filter(x, MutationCount==mc, MutationFrequency==q, GrowthRate == gr)}
 
-# dataSlice2d.MutationFrequency <- read.csv("./data/modelslim.csv")
-# A = data.frame(x = freqRange, y = survivalW)
-# B = data.frame(x = freqRange, y = survivalSingle)
-# C = data.frame(x = freqRange, y = survivalRecurse)
-# D = data.frame(x = dataSlice2d.MutationFrequency$MutationFrequency, y = dataSlice2d.MutationFrequency$extinctionRate)
-
-# A = data.frame(x = rnorm(10),y=rnorm(10))
-# B = data.frame(x = rnorm(10),y=rnorm(10))
-# ggplot(A,aes(x,y)) +geom_point() +geom_point(data=B,colour='red') + xlim(0, 10)
-
-
-
-
-
-
-
-# freqRange <- slimData$MutationFrequency
 svglite("figures/figure_1.svg", width = 8, height = 6)
-
 funcrange<-list(depFreq,c(0.0,0.1))
-
 plot(extinctionRate~MutationFrequency,data=funcrange[[1]](survivalW),col="red",ylim=c(0,1),xlim=funcrange[[2]],pch=2,xlab="",ylab="",axes = FALSE)
 par(new=TRUE)
 plot(extinctionRate~MutationFrequency,data=funcrange[[1]](survivalSingle),col="green",ylim=c(0,1),xlim=funcrange[[2]],pch=2,xlab="",ylab="",axes = FALSE)
@@ -110,7 +90,7 @@ plot(extinctionRate~GrowthRate,data=funcrange[[1]](slimData),col="black",ylim=c(
 dev.off()
 
 
-
+# Broader comparison of best Numerical vs Slim hermaphrodite
 
 survivalRecurse <- read.table("./data/bestmodeldiff_02072025_2_model3.csv", header = FALSE, sep=",") %>%
   rename(MutationFrequency=V2, MutationCount=V1, Individuals=V3, GrowthRate=V4,Result=V5) %>%
@@ -138,30 +118,9 @@ slimData["modelDiffs"] = slimData$extinctionRate-survivalRecurse$extinctionRate
 summary(slimData$modelDiffs)
 
 filteredSlimData <- slimData %>% filter(extinctionRate+modelDiffs/2 > 0.025,extinctionRate+modelDiffs/2 < 0.975)
-# temp<-slimData %>% select(-count,-Individuals) %>% arrange(modelDiffs)
-
 
 summary(filteredSlimData$modelDiffs)
 
-
-# gr<-3
-# i<-10
-
-# focusedDataByLoad <- slimData %>%
-# filter(GrowthRate == gr) %>% 
-# filter(Individuals == i)
-# colors <- c("#ff0000", 
-#           "#0000ff")
-
-# ggplot(focusedDataByLoad,aes(x=MutationFrequency,y=MutationCount),) +
-# # ggtitle(sprintf("%s gr=%s i=%s",title,gr,i)) +
-# geom_tile(aes(fill=modelDiffs)) +
-# # scale_x_continuous(breaks = seq(0, max(focusedDataByLoad$Individuals), 25),expand = c(0,0)) +
-# # scale_y_continuous(breaks = seq(0, 150, 5) ,expand = c(0,0)) +
-# scale_fill_gradientn(name = "", colours = colors ,guide="none") +
-# theme_classic() +
-# labs(fill = "Generations") +
-# theme(legend.title.align=0.5)
 
 dotpointscale = 0.75/1.35
 svglite("figures/figure_S2.svg", width = 13*dotpointscale, height = 10*dotpointscale)
