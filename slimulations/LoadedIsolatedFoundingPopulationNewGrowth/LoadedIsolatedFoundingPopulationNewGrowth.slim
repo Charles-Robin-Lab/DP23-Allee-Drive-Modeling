@@ -1,0 +1,286 @@
+initialize() {
+    // setSeed(2073423208520);
+    setSeed(rdunif(1, 0, asInteger(2 ^ 62) - 1));
+    initializeSLiMModelType("nonWF");
+    defineConstantIfNotExist("sexed", T);
+    defineConstantIfNotExist("femaleOnlyEffect", T);
+    defineConstantIfNotExist("mutsFrequency", 0.04);
+    defineConstantIfNotExist("mutsCount", 200);
+    defineConstantIfNotExist("mutsHetFitnessDiff", 0.000);
+    defineConstantIfNotExist("homozygousSterilityChance", 1.0);
+    defineConstantIfNotExist("genomeSize", 100e+6);
+    defineConstantIfNotExist("migrantsSize", 25);
+    defineConstantIfNotExist("sterility", F);
+    defineConstantIfNotExist("postCompetitionMutationTiming", F);
+    defineConstantIfNotExist("xlinked", F);
+    defineConstantIfNotExist("maximalAverageFemaleOffspring", 3.5);
+    defineConstantIfNotExist("carryingCapacity", 1000);
+    defineConstantIfNotExist("outputFilePath", "../data/out1.csv");
+    // defineConstantIfNotExist("fitnessLogFilePath", "./out2.csv");
+    defineConstantIfNotExist("recombinationRate", 0);
+    //	WARNING: spacing between mutations untested if mutations % chromosomeCount != 0
+    defineConstantIfNotExist("chromosomeCount", 1);
+    // WARNING: max is 10,000 without further edits
+    defineConstantIfNotExist("maxGenerations", 2000);
+    defineConstant("densityDependentMortalityRate",(maximalAverageFemaleOffspring-(sexed ? 2 else 1))/(maximalAverageFemaleOffspring*carryingCapacity));
+
+    initializeMutationRate(0.0);
+    initializeMutationType("m0", 0.5, "f", 0.0);
+    initializeGenomicElementType("g0", m0, 1.0);
+    initializeGenomicElement(g0, 0, genomeSize - 1);
+    rates = c(recombinationRate, rep(c(0.5, recombinationRate), chromosomeCount - 1));
+    ends = integer(0);
+    for (i in seqLen(max(chromosomeCount - 1, 0)) + 1) {
+        ends = c(ends, asInteger(genomeSize * (i) / chromosomeCount - 1), asInteger(genomeSize * (i) / chromosomeCount));
+    }
+    ends = c(ends, genomeSize - 1);
+    initializeRecombinationRate(rates, ends);
+    if (sexed) {
+        initializeSex(xlinked ? "X" else "A");
+    }
+
+    for (i in seqLen(mutsCount) + 1) {
+        mut = initializeMutationType("m" + asString(i), 1.0, "f", mutsHetFitnessDiff);
+        mut.color = "green";
+    }
+}
+
+function(void) defineConstantIfNotExist(string$ symbol, *value) {
+    if (!exists(symbol)) {
+        defineConstant(symbol, value);
+    }
+}
+
+1 late() {
+    if (sexed)
+        sim.addSubpop(0, migrantsSize, rbinom(1,migrantsSize,0.5)/migrantsSize);
+    else 
+        sim.addSubpop(0, migrantsSize);
+    
+    // add mutations
+    muts = community.allMutationTypes;
+    possibleCarrierChromosomes = sim.subpopulations.individuals.genomes[!(sim.subpopulations.individuals.genomes.isNullGenome)];
+    for (i in seqLen(mutsCount) + 1) {
+        sample(
+            possibleCarrierChromosomes,
+            rbinom(1, size(possibleCarrierChromosomes), mutsFrequency)
+        ).addNewDrawnMutation(muts[i], asInteger(genomeSize * (i - 1) / mutsCount));
+    }
+    // stats
+    defineConstant("foundingMalesCount", sum(sim.subpopulations[0].individuals.sex == "M"));
+    sim.subpopulations.individuals.tagL0 = F;
+}
+
+first() {
+    if (sim.cycle > 1 & exists("fitnessLogFilePath"))
+    {
+        if (!isNULL(fitnessLogFilePath)) {
+        		writeFitnessData();
+        }
+    }
+}
+
+reproduction() {
+    if (sexed)
+        if (individual.sex != "F")
+            return;
+    sterileFemale = F;
+    // steriles dont reproduce
+    if (sterility)
+        if (any(2 <= copiesOfMutations(individual, community.allMutationTypes))) {
+            if (postCompetitionMutationTiming)
+                sterileFemale=T;
+            else
+                return;
+        }
+    // produce offspring
+    for (i in seqLen(rpois(1, maximalAverageFemaleOffspring))) {
+        mate = sexed ? subpop.sampleIndividuals(1, sex = "M") else subpop.sampleIndividuals(1);
+        sterileMale = F;
+        if (size(mate)) {
+            // sterile males dont reproduce
+            if (!femaleOnlyEffect & sterility)
+                if (any(2 <= copiesOfMutations(mate, community.allMutationTypes))) {
+                    if (postCompetitionMutationTiming)
+                        sterileMale=T;
+                    else
+                        next;
+                }
+            child = subpop.addCrossed(individual, mate);
+            child.tagL0 = sterileFemale | sterileMale;
+        }
+    }
+}
+
+modifyChild() {
+    ////lethals die
+    if (sterility | postCompetitionMutationTiming)
+        return T;
+    if (sexed)
+        if (femaleOnlyEffect)
+            if (child.sex != "F")
+                return T;
+
+    return !any(2 <= copiesOfMutations(child, community.allMutationTypes));
+}
+
+// this function assumes a sexed population
+function(float) calculateMeanFitness(o<Subpopulation>$ subpop) {
+    females = subpop.subsetIndividuals(sex='F');
+    males = subpop.subsetIndividuals(sex='M');
+    meanFitness = 0;
+    for (indf in females) {
+        femaleFitness = 0;
+        mutsf = copiesOfMutations(indf, community.allMutationTypes);
+        // are they sterile?
+        if (sterility)
+            if (any(2 <= mutsf))
+                next;
+        for (indm in males) { 
+            if (!femaleOnlyEffect & sterility) {
+                mutsm = copiesOfMutations(indm, community.allMutationTypes);
+                // are they sterile?
+                if (any(2 <= mutsm)) {
+                    next;
+                }
+                mutsm = mutsm[mutsf!=0];
+            } else {
+                mutsm = copiesOfMutations(indm, community.allMutationTypes[mutsf!=0]);
+            }
+            //fitness
+            if (sterility | isNULL(mutsm)) {
+                pairFitness = 1;
+            } else {    
+                // femaleOnlyEffect: 1 mut => 87.5% viable progeny, 2 => 75%
+                // both: 1 mut => 75% viable progeny
+                fitnessCoeffecients = 1-(mutsf[mutsf!=0]*mutsm)/(4*(2^asInteger(femaleOnlyEffect)));
+                pairFitness = cumProduct(fitnessCoeffecients)[size(mutsm)-1];
+            }
+            femaleFitness = femaleFitness + pairFitness;
+        }
+        meanFitness = meanFitness + femaleFitness/max(1,size(males));
+    }
+    return meanFitness/max(1,size(females));  
+}
+
+function(integer) copiesOfMutations(o<Individual> $ ind, o<MutationType> mutTypes) {
+    out = c();
+    for (mutType in mutTypes) {
+        mut = sim.mutationsOfType(mutType);
+        // mutation present
+        if (size(mut) != 1) {
+            out = c(out, 0);
+            next;
+        }
+
+        // copies
+        hasMutOnChromosome1 = ind.genome1.containsMutations(mut);
+        hasMutOnChromosome2 = ind.genome2.containsMutations(mut);
+        out = c(out, asInteger(hasMutOnChromosome1) + asInteger(hasMutOnChromosome2));
+    }
+    return out;
+}
+
+function(float) timeTilNextDeath(f $ rate) {
+    //inversecdf of exponential distribution
+    return -log(1-runif(1))/rate;
+}
+
+2 : 9999 early() {
+    // kill old individuals
+    inds = sim.subpopulations.individuals;
+    sim.killIndividuals(inds[inds.age >= 1]);
+    // density dependent killing
+    // WARNING:does not generalise to mutliple pops
+    inds = sim.subpopulations.individuals;
+    n = size(inds);
+    passed_time = timeTilNextDeath(densityDependentMortalityRate*n^2);
+    while (passed_time < 1 & n>0) {
+        n = n - 1;
+        passed_time = passed_time + timeTilNextDeath(densityDependentMortalityRate*n^2);
+    }
+    sim.killIndividuals(sim.subpopulations.sampleIndividuals(size(inds)-n));
+    // post competition effects
+    inds = sim.subpopulations.individuals;
+    //sterility
+    sim.killIndividuals(inds[inds.tagL0]);
+    //lethality
+    if (!sterility & postCompetitionMutationTiming) {
+        if (sexed & femaleOnlyEffect)
+            inds = sim.subpopulations.individuals[sim.subpopulations.individuals.sex == "F"];
+        if (size(inds)==0) 
+            return;
+        sim.killIndividuals(inds[sapply(inds,"any(2 <= copiesOfMutations(applyValue, community.allMutationTypes));")]);
+    }
+
+}
+
+2 : 9999 late() {
+    // end condition 1: population crash
+    if (size(sim.subpopulations[0].individuals) == 0) {
+        cat("EXTINCT\n");
+        if (!exists("slimgui"))
+            writeOutputData("EXTINCT");
+        sim.simulationFinished();
+        return;
+    }
+    // end condition 2: survival
+    if (size(sim.subpopulations[0].individuals) >= carryingCapacity) {
+        cat("SURVIVED\n");
+        if (!exists("slimgui"))
+            writeOutputData("SURVIVED");
+        sim.simulationFinished();
+        return;
+    }
+    // end condition 3: long term suppression
+    if (sim.cycle > maxGenerations) {
+        result = "LOADED_SURVIVAL";
+        cat(result + "\n");
+        if (!exists("slimgui"))
+            writeOutputData(result);
+        sim.simulationFinished();
+        return;
+    }
+}
+
+10000 late() {
+    // end condition 3: long term suppression
+    result = "LOADED_SURVIVAL";
+    cat(result + "\n");
+    if (!exists("slimgui"))
+        writeOutputData(result);
+    sim.simulationFinished();
+}
+
+function(void) writeOutputData(string result) {
+    writeFile(outputFilePath,
+              asString(getSeed()) + "," +
+                  asString(result) + "," +
+                  asString(sim.cycle) + "," +
+                  asString(foundingMalesCount) + "," +
+                  asString(migrantsSize) + "," +
+                  asString(maximalAverageFemaleOffspring) + "," +
+                  asString(recombinationRate) + "," +
+                  asString(chromosomeCount) + "," +
+                  asString(maxGenerations) + "," +
+                  asString(carryingCapacity) + "," +
+                  asString(mutsFrequency) + "," +
+                  asString(mutsCount) + "," +
+                  asString(sterility) + "," +
+                  asString(postCompetitionMutationTiming) + "," +
+                  asString(xlinked) + "," +
+                  asString(femaleOnlyEffect),
+              append = T);
+}
+
+function(void) writeFitnessData(void) {
+    pop = sim.subpopulations[0];
+    writeFile(fitnessLogFilePath,
+              asString(getSeed()) + "," +
+                  asString(calculateMeanFitness(pop)) + "," +
+                  asString(maximalAverageFemaleOffspring) + "," +
+                  asString(sim.cycle) + "," +
+                  asString(size(pop.individuals)) + "," +
+                  asString(size(pop.subsetIndividuals(sex='F'))),
+              append = T);
+}
