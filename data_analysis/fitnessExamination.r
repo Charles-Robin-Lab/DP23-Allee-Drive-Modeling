@@ -99,7 +99,7 @@ print(plot)
 dev.off()
 
 
-# Analysis not included in paper, looks at the extinction rate at each founder size in the above populations
+# Analysis not included in paper, looks at the extinct proportion at each founder size in the above populations
 params <- read.csv("./data/out_AlleeEffectFitnessGivenDifferentLoads_LIFPNG_1752936770.csv_params.csv")
 groupedGraphData <- params %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, FemaleOnlyEffect, PostCompetitionMutationTiming, RecombinationRate) %>% 
@@ -109,9 +109,9 @@ groupedGraphData <- params %>%
   summarise()
 focusedSims <- filter(groupedGraphData,Sterile==0,PostCompetitionMutationTiming==0)
 focusedSims2 <- filter(groupedGraphData,Sterile==1,PostCompetitionMutationTiming==0)
-plot(extinctionRate~Individuals,data=focusedSims,ylim=c(0,1),ylab="Extinction rate",xlab="Founding population size (N(0))")
+plot(extinctionRate~Individuals,data=focusedSims,ylim=c(0,1),ylab="Extinct proportion",xlab="Founding population size (N(0))")
 par(new=TRUE)
-plot(extinctionRate~Individuals,data=focusedSims2,ylim=c(0,1),ylab="Extinction rate",xlab="Founding population size (N(0))",col="#ff0000")
+plot(extinctionRate~Individuals,data=focusedSims2,ylim=c(0,1),ylab="Extinct proportion",xlab="Founding population size (N(0))",col="#ff0000")
 
 
 

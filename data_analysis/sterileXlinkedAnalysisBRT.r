@@ -1,6 +1,6 @@
-# A script to examine how extinction rate of sterile vs lethal effect varies through parameter space
+# A script to examine how extinct proportion of sterile vs lethal effect varies through parameter space
   # Exploratory analysis using boosted regression trees
-  # response variable is the normalised difference in extinction rate
+  # response variable is the normalised difference in extinct proportion
   # explanatory variables are parameter axes
 
 library(tidyverse)
@@ -150,14 +150,14 @@ gbm.plot <- function (gbm.object, variable.no = 0, smooth = FALSE, rug = TRUE,
 simulatedDataset <- "E:/out_bestParameterSpace_LIFPNG_1752545194.csv"
 d <- read.csv(simulatedDataset)
 
-# Summarise to give extinction rate
+# Summarise to give extinct proportion
 d <- d %>%
     filter(PostCompetitionMutationTiming==0) %>%
     # remove non-varying parameters
     dplyr::select(-RecombinationRate, -ChromosomeCount, -MaxGenerations, -CarryingCapacity, -FemaleOnlyEffect, -Seed, -PostCompetitionMutationTiming) %>%
     # group by remaining parameter axes
     group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked) %>% 
-    # calculate extinction rate for each part of parameter space
+    # calculate extinct proportion for each part of parameter space
     summarise(count = n(), ExtinctionRate = sum(Result == "EXTINCT") / count)
 
 
@@ -165,9 +165,9 @@ d <- d %>%
 modelDataSterile <- d %>%
     # pivot wider
     pivot_wider(names_from = Sterile, values_from = ExtinctionRate, names_prefix = "Sterile") %>%
-    # calculate difference in extinction rate on the logit scale
+    # calculate difference in extinct proportion on the logit scale
     mutate(logitLethal = log(Sterile0/(1-Sterile0)), logitSterile = log(Sterile1/(1-Sterile1)), diffExtinctionRate = logitSterile-logitLethal) %>%
-    # remove situations where extinction rate was 1 or 0
+    # remove situations where extinct proportion was 1 or 0
     filter(is.finite(diffExtinctionRate)) %>%
     ungroup() %>%
     as.data.frame() # else dismo cries
@@ -215,7 +215,7 @@ svg("figures/figure_S5.svg", width = 7.5, height=7.5)
 gbm.plot(modSterile, n.plots = 4, 
             plot.layout = c(2,2), 
             rug = FALSE, 
-            y.label = "Difference in logit of extinction rate",
+            y.label = "Difference in logit of extinct proportion",
             x.label = ordered_x_labels,
             write.title = FALSE)
 dev.off()
@@ -228,7 +228,7 @@ modInt$interactions
 # plot the most interesting two interactions
 svg("figures/figure_S6A.svg", width = 7.5, height=7.5)
 gbm.perspec(modSterile, modInt$rank.list[1,]$var1.index, modInt$rank.list[1,]$var2.index, z.range = c(-3, 5),
-            z.label = "Difference in logit of extinction rate",
+            z.label = "Difference in logit of extinct proportion",
             y.label = x_labels_no_expr[x_variable_names==modInt$rank.list[1,]$var2.names],
             x.label = x_labels_no_expr[x_variable_names==modInt$rank.list[1,]$var1.names],
             theta=-35+180)
@@ -236,7 +236,7 @@ dev.off()
 
 svg("figures/figure_S6B.svg", width = 7.5, height=7.5)
 gbm.perspec(modSterile, modInt$rank.list[2,]$var1.index, modInt$rank.list[2,]$var2.index, z.range = c(-2, 8),
-            z.label = "Difference in logit of extinction rate",
+            z.label = "Difference in logit of extinct proportion",
             y.label = x_labels_no_expr[x_variable_names==modInt$rank.list[2,]$var2.names],
             x.label = x_labels_no_expr[x_variable_names==modInt$rank.list[2,]$var1.names],
             theta=-35)
@@ -249,9 +249,9 @@ dev.off()
 modelDataXlinked <- d %>%
     # pivot wider
     pivot_wider(names_from = Xlinked, values_from = ExtinctionRate, names_prefix = "Xlinked") %>%
-    # calculate difference in extinction rate on the logit scale
+    # calculate difference in extinct proportion on the logit scale
     mutate(logitAutosomal = log(Xlinked0/(1-Xlinked0)), logitXlinked = log(Xlinked1/(1-Xlinked1)), diffExtinctionRate = logitXlinked-logitAutosomal) %>%
-    # remove situations where extinction rate was 1 or 0
+    # remove situations where extinct proportion was 1 or 0
     filter(is.finite(diffExtinctionRate)) %>%
     ungroup() %>%
     as.data.frame() # else dismo cries
@@ -284,7 +284,7 @@ svg("figures/figure_S7.svg", width = 7.5, height=7.5)
 gbm.plot(modXlinked, n.plots = 4, 
             plot.layout = c(2,2), 
             rug = FALSE, 
-            y.label = "Difference in logit of extinction rate",
+            y.label = "Difference in logit of extinct proportion",
             x.label = ordered_x_labels,
             write.title = FALSE)
 dev.off()
@@ -298,7 +298,7 @@ modInt$interactions
 # plot the most interesting two interactions
 svg("figures/figure_S8A.svg", width = 7.5, height=7.5)
 gbm.perspec(modXlinked, modInt$rank.list[1,]$var1.index, modInt$rank.list[1,]$var2.index, z.range = c(-3, 1),
-            z.label = "Difference in logit of extinction rate",
+            z.label = "Difference in logit of extinct proportion",
             y.label = x_labels_no_expr[x_variable_names==modInt$rank.list[1,]$var2.names],
             x.label = x_labels_no_expr[x_variable_names==modInt$rank.list[1,]$var1.names],
             theta=-35+180)
@@ -307,7 +307,7 @@ dev.off()
 svg("figures/figure_S8B.svg", width = 7.5, height=7.5)
 
 gbm.perspec(modXlinked, modInt$rank.list[2,]$var1.index, modInt$rank.list[2,]$var2.index, z.range = c(-4, 1),
-            z.label = "Difference in logit of extinction rate",
+            z.label = "Difference in logit of extinct proportion",
             y.label = x_labels_no_expr[x_variable_names==modInt$rank.list[2,]$var2.names],
             x.label = x_labels_no_expr[x_variable_names==modInt$rank.list[2,]$var1.names],
             theta=-35

@@ -52,7 +52,7 @@ plot(extinctionRate~MutationFrequency,data=funcrange[[1]](survivalSingle),col="g
 par(new=TRUE)
 plot(extinctionRate~MutationFrequency,data=funcrange[[1]](survivalRecurse),col="blue",ylim=c(0,1),xlim=funcrange[[2]],pch=2,xlab="",ylab="",axes = FALSE)
 par(new=TRUE)
-plot(extinctionRate~MutationFrequency,data=funcrange[[1]](slimData),col="black",ylim=c(0,1),xlim=funcrange[[2]],xlab=expression("Deleterious recessive frequency (" * q * ")"),ylab="Extinction rate")
+plot(extinctionRate~MutationFrequency,data=funcrange[[1]](slimData),col="black",ylim=c(0,1),xlim=funcrange[[2]],xlab=expression("Deleterious recessive frequency (" * q * ")"),ylab="Extinct proportion")
 dev.off()
 
 
@@ -64,7 +64,7 @@ plot(extinctionRate~MutationCount,data=funcrange[[1]](survivalSingle),col="green
 par(new=TRUE)
 plot(extinctionRate~MutationCount,data=funcrange[[1]](survivalRecurse),col="blue",ylim=c(0,1),xlim=funcrange[[2]],pch=2,xlab="",ylab="",axes = FALSE)
 par(new=TRUE)
-plot(extinctionRate~MutationCount,data=funcrange[[1]](slimData),col="black",ylim=c(0,1),xlim=funcrange[[2]],xlab=expression("Deleterious loci count (" * l * ")"),ylab="Extinction rate")
+plot(extinctionRate~MutationCount,data=funcrange[[1]](slimData),col="black",ylim=c(0,1),xlim=funcrange[[2]],xlab=expression("Deleterious loci count (" * l * ")"),ylab="Extinct proportion")
 dev.off()
 
 svglite("figures/figure_S1B.svg", width = 8, height = 6)
@@ -75,7 +75,7 @@ plot(extinctionRate~Individuals,data=funcrange[[1]](survivalSingle),col="green",
 par(new=TRUE)
 plot(extinctionRate~Individuals,data=funcrange[[1]](survivalRecurse),col="blue",ylim=c(0,1),xlim=funcrange[[2]],pch=2,xlab="",ylab="",axes = FALSE)
 par(new=TRUE)
-plot(extinctionRate~Individuals,data=funcrange[[1]](slimData),col="black",ylim=c(0,1),xlim=funcrange[[2]],xlab="Founding population size (N(0))",ylab="Extinction rate")
+plot(extinctionRate~Individuals,data=funcrange[[1]](slimData),col="black",ylim=c(0,1),xlim=funcrange[[2]],xlab="Founding population size (N(0))",ylab="Extinct proportion")
 dev.off()
 
 svglite("figures/figure_S1C.svg", width = 8, height = 6)
@@ -86,7 +86,7 @@ plot(extinctionRate~GrowthRate,data=funcrange[[1]](survivalSingle),col="green",y
 par(new=TRUE)
 plot(extinctionRate~GrowthRate,data=funcrange[[1]](survivalRecurse),col="blue",ylim=c(0,1),xlim=funcrange[[2]],pch=2,xlab="",ylab="",axes = FALSE)
 par(new=TRUE)
-plot(extinctionRate~GrowthRate,data=funcrange[[1]](slimData),col="black",ylim=c(0,1),xlim=funcrange[[2]],xlab=expression("Reproductive output (" * b * ")"),ylab="Extinction rate")
+plot(extinctionRate~GrowthRate,data=funcrange[[1]](slimData),col="black",ylim=c(0,1),xlim=funcrange[[2]],xlab=expression("Reproductive output (" * b * ")"),ylab="Extinct proportion")
 dev.off()
 
 
@@ -125,5 +125,5 @@ summary(filteredSlimData$modelDiffs)
 dotpointscale = 0.75/1.35
 svglite("figures/figure_S2.svg", width = 13*dotpointscale, height = 10*dotpointscale)
 par(mar=c(5,4,2,2)+0.1)
-hist(filteredSlimData$modelDiffs,ylim=c(0,100),xlim=c(-0.5,0.2),breaks = seq(from=-0.5025, to=0.2025, by=0.005),main=NULL,xlab="Difference in extinction rates between individual based and numerical model datapoints")
+hist(filteredSlimData$modelDiffs,ylim=c(0,100),xlim=c(-0.5,0.2),breaks = seq(from=-0.5025, to=0.2025, by=0.005),main=NULL,xlab="Difference in extinct proportions between individual based and numerical model datapoints")
 dev.off()
