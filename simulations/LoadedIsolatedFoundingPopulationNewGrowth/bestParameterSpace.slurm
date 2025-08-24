@@ -7,6 +7,8 @@
 #SBATCH --time=20-0:0:00
 # Parralelise the computation
 #SBATCH --array=1-400
+# Edited heavily by Louis Nowell Nicolle
+# This file will generate the data used for figures: 5, S4, S5, S6, S7, S8, S9
 
 # Source files
 module load GCC/11.3.0

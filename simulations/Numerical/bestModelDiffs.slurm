@@ -1,6 +1,8 @@
 #! /bin/bash
 # Created by the University of Melbourne job script generator for SLURM
 # Thu May 18 2023 02:25:29 GMT+1000 (Australian Eastern Standard Time)
+# Edited by Louis Nowell Nicolle
+# This file will generate the data used for figures: S2
 
 # # # Settings for Sbatch
 

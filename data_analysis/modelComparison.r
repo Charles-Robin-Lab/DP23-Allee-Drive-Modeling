@@ -4,7 +4,7 @@ library(ggplot2)
 library(dplyr)
 
 
-survivalW <- read.table("./data/finalishstochasticround_23062025_model1.csv", header = FALSE, sep=",") %>%
+survivalW <- read.table("./data/final_23062025_model1.csv", header = FALSE, sep=",") %>%
   rename(MutationFrequency=V2, MutationCount=V1, Individuals=V3, GrowthRate=V4,Result=V5) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate) %>% 
   mutate(count = n()) %>%
@@ -12,7 +12,7 @@ survivalW <- read.table("./data/finalishstochasticround_23062025_model1.csv", he
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, extinctionRate, count) %>% 
   summarise()
   
-survivalSingle <- read.table("./data/finalishstochasticround_23062025_model2.csv", header = FALSE, sep=",") %>%
+survivalSingle <- read.table("./data/final_23062025_model2.csv", header = FALSE, sep=",") %>%
   rename(MutationFrequency=V2, MutationCount=V1, Individuals=V3, GrowthRate=V4,Result=V5) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate) %>% 
   mutate(count = n()) %>%
@@ -20,7 +20,7 @@ survivalSingle <- read.table("./data/finalishstochasticround_23062025_model2.csv
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, extinctionRate, count) %>% 
   summarise()
 
-survivalRecurse <- read.table("./data/finalishstochasticround_23062025_model3.csv", header = FALSE, sep=",") %>%
+survivalRecurse <- read.table("./data/final_23062025_model3.csv", header = FALSE, sep=",") %>%
   rename(MutationFrequency=V2, MutationCount=V1, Individuals=V3, GrowthRate=V4,Result=V5) %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate) %>% 
   mutate(count = n()) %>%
@@ -28,7 +28,7 @@ survivalRecurse <- read.table("./data/finalishstochasticround_23062025_model3.cs
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, extinctionRate, count) %>% 
   summarise()
 
-slimData <- read.csv("./data/out_AnalyticalComparison_LIFPNG_1750435735.csv") %>%
+slimData <- read.csv("./data/out_NumericalComparison_LIFPNG_1750435735.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate) %>% 
   mutate(count = n()) %>%
   mutate(extinctionRate = sum(Result == "EXTINCT") / count) %>%
@@ -100,7 +100,7 @@ survivalRecurse <- read.table("./data/bestmodeldiff_02072025_2_model3.csv", head
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, extinctionRate, count) %>% 
   summarise() %>% 
   arrange(MutationFrequency, MutationCount, Individuals, GrowthRate, extinctionRate, count)
-slimData <- read.csv("./data/out_AnalyticalComparisonWide_LIFPNG_merged_1750792216_1751383220_1751461342.csv") %>%
+slimData <- read.csv("./data/out_NumericalComparisonWide_LIFPNG_merged_1750792216_1751383220_1751461342.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate) %>% 
   mutate(count = n()) %>%
   mutate(extinctionRate = sum(Result == "EXTINCT") / count) %>%

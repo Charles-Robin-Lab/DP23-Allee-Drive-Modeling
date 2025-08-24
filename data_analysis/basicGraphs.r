@@ -96,6 +96,7 @@ dev.off()
 
 
 # Analysis not included in the paper, compares loads that also affect both sexes vs females and sterile vs lethal of each.
+# Fresher data will need to be generated for this to be reanalysed as the most recent data is prior to reviewer comments/changes
 ##### Load comparison ####
 groupedGraphData <- read.csv("./data/out_GraphSlicesLoadTypeCompare_LIFP_1697426721.csv") %>%
   group_by(MutationFrequency, MutationCount, Individuals, GrowthRate, Sterile, Xlinked, FemaleOnlyEffect) %>% 
