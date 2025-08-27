@@ -147,7 +147,7 @@ gbm.plot <- function (gbm.object, variable.no = 0, smooth = FALSE, rug = TRUE,
 }
 
 # load dataset
-simulatedDataset <- "E:/out_bestParameterSpace_LIFPNG_1752545194.csv"
+simulatedDataset <- "./data/out_bestParameterSpace_LIFPNG_1752545194.csv"
 d <- read.csv(simulatedDataset)
 
 # Summarise to give extinct proportion
@@ -211,7 +211,7 @@ x_labels_no_expr<- c(
 ordered_x_labels<- x_labels[order(match(x_variable_names,modSterile$contributions[[1]] ))] 
 
 # make a plot of marginal predictor functions (omitting x-linked which doesn't do much)
-svg("figures/figure_S5.svg", width = 7.5, height=7.5)
+svg("figures/figure_S4.svg", width = 7.5, height=7.5)
 gbm.plot(modSterile, n.plots = 4, 
             plot.layout = c(2,2), 
             rug = FALSE, 
@@ -226,7 +226,7 @@ modInt$rank.list
 modInt$interactions
 
 # plot the most interesting two interactions
-svg("figures/figure_S6A.svg", width = 7.5, height=7.5)
+svg("figures/figure_S5A.svg", width = 7.5, height=7.5)
 gbm.perspec(modSterile, modInt$rank.list[1,]$var1.index, modInt$rank.list[1,]$var2.index, z.range = c(-3, 5),
             z.label = "Difference in logit of extinct proportion",
             y.label = x_labels_no_expr[x_variable_names==modInt$rank.list[1,]$var2.names],
@@ -234,7 +234,7 @@ gbm.perspec(modSterile, modInt$rank.list[1,]$var1.index, modInt$rank.list[1,]$va
             theta=-35+180)
 dev.off()
 
-svg("figures/figure_S6B.svg", width = 7.5, height=7.5)
+svg("figures/figure_S5B.svg", width = 7.5, height=7.5)
 gbm.perspec(modSterile, modInt$rank.list[2,]$var1.index, modInt$rank.list[2,]$var2.index, z.range = c(-2, 8),
             z.label = "Difference in logit of extinct proportion",
             y.label = x_labels_no_expr[x_variable_names==modInt$rank.list[2,]$var2.names],

@@ -201,7 +201,7 @@ dev.off()
 cor(sterileRisk,sterileLessData)
 range(sterileRisk[sterileRisk!=Inf])
 
-svglite("figures/figure_S4.svg", width = 10, height = 10)
+svglite("figures/figure_S6.svg", width = 10, height = 10)
 hist(sterileRisk[sterileRisk!=Inf],xlim=c(0.25,400),log='x',breaks = 10^seq(from=-0.6, to=2.6, by=0.01),ylim=c(0,2.5),main=NULL,xlab="Risk ratio of extinction given sterility instead of lethality",xaxt='n')
 abline(v = 1,col='#f55b02')
 ticks_at =c(2^seq(from=-2, to=8, by=1),400)
