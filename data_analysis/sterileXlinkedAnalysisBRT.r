@@ -215,7 +215,7 @@ svg("figures/figure_S4.svg", width = 7.5, height=7.5)
 gbm.plot(modSterile, n.plots = 4, 
             plot.layout = c(2,2), 
             rug = FALSE, 
-            y.label = "Difference in logit of extinct proportion",
+            y.label = "Difference in logit of extinct proportions",
             x.label = ordered_x_labels,
             write.title = FALSE)
 dev.off()
@@ -228,15 +228,15 @@ modInt$interactions
 # plot the most interesting two interactions
 svg("figures/figure_S5A.svg", width = 7.5, height=7.5)
 gbm.perspec(modSterile, modInt$rank.list[1,]$var1.index, modInt$rank.list[1,]$var2.index, z.range = c(-3, 5),
-            z.label = "Difference in logit of extinct proportion",
+            z.label = "Difference in logit of extinct proportions",
             y.label = x_labels_no_expr[x_variable_names==modInt$rank.list[1,]$var2.names],
             x.label = x_labels_no_expr[x_variable_names==modInt$rank.list[1,]$var1.names],
             theta=-35+180)
 dev.off()
 
 svg("figures/figure_S5B.svg", width = 7.5, height=7.5)
-gbm.perspec(modSterile, modInt$rank.list[2,]$var1.index, modInt$rank.list[2,]$var2.index, z.range = c(-2, 8),
-            z.label = "Difference in logit of extinct proportion",
+gbm.perspec(modSterile, modInt$rank.list[2,]$var1.index, modInt$rank.list[2,]$var2.index, z.range = c(0, 9),
+            z.label = "Difference in logit of extinct proportions",
             y.label = x_labels_no_expr[x_variable_names==modInt$rank.list[2,]$var2.names],
             x.label = x_labels_no_expr[x_variable_names==modInt$rank.list[2,]$var1.names],
             theta=-35)
@@ -284,7 +284,7 @@ svg("figures/figure_S7.svg", width = 7.5, height=7.5)
 gbm.plot(modXlinked, n.plots = 4, 
             plot.layout = c(2,2), 
             rug = FALSE, 
-            y.label = "Difference in logit of extinct proportion",
+            y.label = "Difference in logit of extinct proportions",
             x.label = ordered_x_labels,
             write.title = FALSE)
 dev.off()
@@ -298,7 +298,7 @@ modInt$interactions
 # plot the most interesting two interactions
 svg("figures/figure_S8A.svg", width = 7.5, height=7.5)
 gbm.perspec(modXlinked, modInt$rank.list[1,]$var1.index, modInt$rank.list[1,]$var2.index, z.range = c(-3, 1),
-            z.label = "Difference in logit of extinct proportion",
+            z.label = "Difference in logit of extinct proportions",
             y.label = x_labels_no_expr[x_variable_names==modInt$rank.list[1,]$var2.names],
             x.label = x_labels_no_expr[x_variable_names==modInt$rank.list[1,]$var1.names],
             theta=-35+180)
@@ -307,7 +307,7 @@ dev.off()
 svg("figures/figure_S8B.svg", width = 7.5, height=7.5)
 
 gbm.perspec(modXlinked, modInt$rank.list[2,]$var1.index, modInt$rank.list[2,]$var2.index, z.range = c(-4, 1),
-            z.label = "Difference in logit of extinct proportion",
+            z.label = "Difference in logit of extinct proportions",
             y.label = x_labels_no_expr[x_variable_names==modInt$rank.list[2,]$var2.names],
             x.label = x_labels_no_expr[x_variable_names==modInt$rank.list[2,]$var1.names],
             theta=-35

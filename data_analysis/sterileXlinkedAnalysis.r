@@ -73,8 +73,8 @@ print(colMeans(xlower), digits = 4)
 print(colMeans(xhigher), digits = 4)
 
 
+nsamples <- 400
 if (!file.exists("./data/expectedNullXlinkedAutosomalDiff.csv")) {
-  nsamples <- 400
   s1<-(-nsamples):nsamples
   p1 <- xtestData[xtestData$Xlinked==1,]$expectedExtinctionRate
   y1<-sapply(s1, function(x) sum(diffBin(x, nsamples, p1, nsamples, p1)))
@@ -161,8 +161,8 @@ sterilelower <- steriletestData[steriletestData$Sterile==1,][p <pthresh & steril
 sterilehigher <- steriletestData[steriletestData$Sterile==1,][p <pthresh & !sterileislowertail,]
 
 
+nsamples <- 400
 if (!file.exists("./data/expectedNullSterileLethalDiff.csv")) {
-  nsamples <- 400
   s<-(-nsamples):nsamples
   p <- steriletestData[steriletestData$Sterile==1,]$expectedExtinctionRate
   y<-sapply(s, function(x) sum(diffBin(x, nsamples, p, nsamples, p)))
@@ -283,8 +283,8 @@ sterileTiminghigher <- timingTestData[timingTestData$PostCompetitionMutationTimi
 all((timingTestData[timingTestData$PostCompetitionMutationTiming==1 & timingTestData$Sterile==1,]$GrowthRate-timingTestData[timingTestData$PostCompetitionMutationTiming==0 & timingTestData$Sterile==1,]$GrowthRate) ==0)
 
 
+nsamples <- 400
 if (!file.exists("./data/expectedNullPrePostLethalDiff.csv")) {
-  nsamples <- 400
   s<-(-nsamples):nsamples
   p <- timingTestData[timingTestData$PostCompetitionMutationTiming==1 & timingTestData$Sterile==0 ,]$expectedExtinctionRate
   y<-sapply(s, function(x) sum(diffBin(x, nsamples, p, nsamples, p)))
@@ -316,8 +316,8 @@ arrows((s/nsamples)[qcoltop!=0], qcolbot[qcoltop!=0], (s/nsamples)[qcoltop!=0], 
 dev.off()
 
 
+nsamples <- 400
 if (!file.exists("./data/expectedNullPrePostSterileDiff.csv")) {
-  nsamples <- 400
   s<-(-nsamples):nsamples
   p <- timingTestData[timingTestData$PostCompetitionMutationTiming==1 & timingTestData$Sterile==1 ,]$expectedExtinctionRate
   y<-sapply(s, function(x) sum(diffBin(x, nsamples, p, nsamples, p)))
