@@ -100,7 +100,7 @@ sum(y1) - as.double(length(xlinkedDiffs)) < 1e-10
 dotpointscale = 0.75/1.35
 svglite("figures/figure_5A.svg", width = 13*dotpointscale, height = 10*dotpointscale)
 par(mar=c(5,4,2,2)+0.1)
-hist(xlinkedDiffs,ylim=c(0,1000),xlim=c(-0.275,0.275),breaks = seq(from=-0.40125, to=0.40125, by=0.0025),main=NULL,xlab="Difference in extinct proportions between xlinked and autosomal datapoints",axes=FALSE)
+hist(xlinkedDiffs,ylim=c(0,1000),xlim=c(-0.275,0.275),breaks = seq(from=-0.40125, to=0.40125, by=0.0025),main=NULL,xlab="Difference in extinction proportions between xlinked and autosomal datapoints",axes=FALSE)
 par(new=TRUE)
 arrows((s1/nsamples)[qcoltop!=0], qcolbot[qcoltop!=0], (s1/nsamples)[qcoltop!=0], qcoltop[qcoltop!=0],col="#665757", lwd =0.75, length=0.010, angle=90, code=3)
 par(new=TRUE)
@@ -190,7 +190,7 @@ qcolbot<- mapply(function(p) {
 dotpointscale = 0.75/1.35
 svglite("figures/figure_5B.svg", width = 13*dotpointscale, height = 10*dotpointscale)
 par(mar=c(5,4,2,2)+0.1)
-hist(sterileDiffs,ylim=c(0,1000),xlim=c(-0.1,1.0),breaks = seq(from=-1.00125, to=1.00125, by=0.0025),lwd =0.1,main=NULL,xlab="Difference in extinct proportions between sterile and lethal datapoints",axes=FALSE)
+hist(sterileDiffs,ylim=c(0,1000),xlim=c(-0.1,1.0),breaks = seq(from=-1.00125, to=1.00125, by=0.0025),lwd =0.1,main=NULL,xlab="Difference in extinction proportions between sterile and lethal datapoints",axes=FALSE)
 par(new=TRUE)
 hist(2*(sterilelower$extinctionRate - sterilelower$expectedExtinctionRate),ylim=c(0,1000),xlim=c(-0.1,1.0),col="red",lwd =0.1,breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,axes=FALSE,xlab='',ylab='')
 par(new=TRUE)
@@ -208,7 +208,7 @@ ticks_at =c(2^seq(from=-2, to=8, by=1),400)
 axis(side=1, at=ticks_at, labels=ticks_at)
 dev.off()
 
-hist(sterileRisk,breaks = seq(from=-1.005, to=0.905, by=0.05),main=NULL,xlab="Difference in extinct proportions between sterile and lethal datapoints",axes=FALSE)
+hist(sterileRisk,breaks = seq(from=-1.005, to=0.905, by=0.05),main=NULL,xlab="Difference in extinction proportions between sterile and lethal datapoints",axes=FALSE)
 10^mean(log10(sterileRisk[sterileRisk<=1000000]))
 summary(sterileRisk[sterileRisk<=100000000])
 
@@ -307,7 +307,7 @@ qcolbot<- mapply(function(p) {
 dotpointscale = 0.75/1.35
 svglite("figures/figure_S9A.svg", width = 13*dotpointscale, height = 10*dotpointscale)
 par(mar=c(5,4,2,2)+0.1)
-hist(lethalTimingDiffs,ylim=c(0,1000),xlim=c(-0.1,0.4),breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,xlab="Difference in extinct proportions between post and premortality lethal datapoints",axes=FALSE)
+hist(lethalTimingDiffs,ylim=c(0,1000),xlim=c(-0.1,0.4),breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,xlab="Difference in extinction proportions between post and premortality lethal datapoints",axes=FALSE)
 par(new=TRUE)
 hist(2*(lethalTiminglower$extinctionRate - lethalTiminglower$expectedExtinctionRate),ylim=c(0,1000),xlim=c(-0.1,0.4),col="red",lwd =0.1,breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,axes=FALSE,xlab='',ylab='')
 par(new=TRUE)
@@ -340,7 +340,7 @@ qcolbot<- mapply(function(p) {
 dotpointscale = 0.75/1.35
 svglite("figures/figure_S9B.svg", width = 13*dotpointscale, height = 10*dotpointscale)
 par(mar=c(5,4,2,2)+0.1)
-hist(sterileTimingDiffs,ylim=c(0,1000),xlim=c(-0.1,1.0),breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,xlab="Difference in extinct proportions between post and premortality sterility datapoints",axes=FALSE)
+hist(sterileTimingDiffs,ylim=c(0,1000),xlim=c(-0.1,1.0),breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,xlab="Difference in extinction proportions between post and premortality sterility datapoints",axes=FALSE)
 par(new=TRUE)
 hist(2*(sterileTiminglower$extinctionRate - sterileTiminglower$expectedExtinctionRate),ylim=c(0,1000),xlim=c(-0.1,1.0),col="red",lwd =0.1,breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,axes=FALSE,xlab='',ylab='')
 par(new=TRUE)

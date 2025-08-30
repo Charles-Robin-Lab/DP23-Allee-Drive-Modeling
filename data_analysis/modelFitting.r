@@ -44,7 +44,7 @@ par(mar=c(5,4,2,2)+0.1)
 ggplot(groupedGraphData,aes(x=MutationFrequency,y=MutationCount),) +
   geom_tile(aes(fill=extinctionRate)) +
   theme(panel.background = element_blank()) +
-  scale_fill_gradientn(name = "Extinct proportion", colours = colors,limits=c(0,1)) +
+  scale_fill_gradientn(name = "Proportion extinct", colours = colors,limits=c(0,1)) +
   xlab(expression("Deleterious recessive frequency (" * q * ")")) +
   ylab(expression("Deleterious loci count (" * l * ")")) +
   theme_classic() +
