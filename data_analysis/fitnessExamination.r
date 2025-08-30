@@ -69,7 +69,7 @@ for (j in 1:length(points)) {
 }
 par(new=FALSE)
 legend("bottomright", inset = c(0.05, 0.05),  
-  title="Generations",
+  title="Generation",
   legend = points,
   pch=16,
   col=colors)
