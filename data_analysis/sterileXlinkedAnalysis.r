@@ -100,7 +100,7 @@ sum(y1) - as.double(length(xlinkedDiffs)) < 1e-10
 dotpointscale = 0.75/1.35
 svglite("figures/figure_5A.svg", width = 13*dotpointscale, height = 10*dotpointscale)
 par(mar=c(5,4,2,2)+0.1)
-hist(xlinkedDiffs,ylim=c(0,1000),xlim=c(-0.275,0.275),breaks = seq(from=-0.40125, to=0.40125, by=0.0025),main=NULL,xlab="Difference in extinction proportions between xlinked and autosomal datapoints",axes=FALSE)
+hist(xlinkedDiffs,ylim=c(0,1000),xlim=c(-0.275,0.275),breaks = seq(from=-0.40125, to=0.40125, by=0.0025),main=NULL,xlab="Difference in extinction proportions between X-linked and autosomal datapoints",axes=FALSE)
 par(new=TRUE)
 arrows((s1/nsamples)[qcoltop!=0], qcolbot[qcoltop!=0], (s1/nsamples)[qcoltop!=0], qcoltop[qcoltop!=0],col="#665757", lwd =0.75, length=0.010, angle=90, code=3)
 par(new=TRUE)
@@ -202,7 +202,7 @@ cor(sterileRisk,sterileLessData)
 range(sterileRisk[sterileRisk!=Inf])
 
 svglite("figures/figure_S6.svg", width = 10, height = 10)
-hist(sterileRisk[sterileRisk!=Inf],xlim=c(0.25,400),log='x',breaks = 10^seq(from=-0.6, to=2.6, by=0.01),ylim=c(0,2.5),main=NULL,xlab="Risk ratio of extinction given sterility instead of lethality",xaxt='n')
+hist(sterileRisk[sterileRisk!=Inf],xlim=c(0.25,400),freq = TRUE,log="x",breaks = 10^seq(from=-0.6, to=2.6, by=0.01),ylim=c(0,800),main=NULL,xlab="Risk ratios of extinction given sterility instead of lethality",xaxt='n')
 abline(v = 1,col='#f55b02')
 ticks_at =c(2^seq(from=-2, to=8, by=1),400)
 axis(side=1, at=ticks_at, labels=ticks_at)
