@@ -34,7 +34,6 @@ rHomozygotes <- function(N,Nmuts) {
 
 PMFGeneDrift <- function(freq,N,mutCount) {
     # Wright-Fisher Model
-    # TODO: I have assumed that changing popsize doesn't affect this formula
     exp(lfactorial(2*N)-lfactorial(mutCount)-lfactorial(2*N-mutCount))*freq^mutCount*(1-freq)^(2*N-mutCount)
 }
 rGeneDrift <- function(Nmuts,prevN,nextN) {

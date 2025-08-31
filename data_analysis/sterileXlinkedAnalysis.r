@@ -171,6 +171,7 @@ if (!file.exists("./data/expectedNullSterileLethalDiff.csv")) {
 
 s <- read.csv('./data/expectedNullSterileLethalDiff.csv')$s
 y <- read.csv('./data/expectedNullSterileLethalDiff.csv')$y
+max(sterileDiffs)
 mean(sterileDiffs)
 sterileLessData <- subset(steriletestData[steriletestData$Sterile==1,], select = -c(Sterile, expectedExtinctionRate))
 cor(sterileDiffs,sterileLessData)
@@ -202,15 +203,15 @@ cor(sterileRisk,sterileLessData)
 range(sterileRisk[sterileRisk!=Inf])
 
 svglite("figures/figure_S6.svg", width = 10, height = 10)
-hist(sterileRisk[sterileRisk!=Inf],xlim=c(0.25,400),freq = TRUE,log="x",breaks = 10^seq(from=-0.6, to=2.6, by=0.01),ylim=c(0,800),main=NULL,xlab="Risk ratios of extinction given sterility instead of lethality",xaxt='n')
+hist(sterileRisk[sterileRisk!=Inf],xlim=c(0.25,400),freq = TRUE,log="x",breaks = 10^seq(from=-0.6, to=2.6, by=0.01),ylim=c(0,800),main=NULL,xlab="Risk ratio of extinction given sterility instead of lethality",xaxt='n')
 abline(v = 1,col='#f55b02')
 ticks_at =c(2^seq(from=-2, to=8, by=1),400)
 axis(side=1, at=ticks_at, labels=ticks_at)
 dev.off()
 
 hist(sterileRisk,breaks = seq(from=-1.005, to=0.905, by=0.05),main=NULL,xlab="Difference in extinction proportions between sterile and lethal datapoints",axes=FALSE)
-10^mean(log10(sterileRisk[sterileRisk<=1000000]))
-summary(sterileRisk[sterileRisk<=100000000])
+10^mean(log10(sterileRisk[sterileRisk!=Inf]))
+summary(sterileRisk[sterileRisk!=Inf])
 
 # pre and post diffs
 
