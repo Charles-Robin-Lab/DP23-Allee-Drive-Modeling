@@ -100,10 +100,9 @@ apply(loads,1,function(load) {
 
 
 svglite("figures/figure_S10.svg", width = 4.1, height = 5.5)
-
 ggplot(data, aes(x=individuals, y=outcomeProportion, fill=outcomeGroup)) + 
       scale_x_continuous(breaks = round(seq(min(individuals), max(individuals), by = 15),1)) +
-      xlab("Individuals") + 
+      xlab("Founding population size (N(0))") + 
       theme(panel.background = element_blank()) +
       theme(legend.position = "none") + 
       ylab("Outcome proportion") +

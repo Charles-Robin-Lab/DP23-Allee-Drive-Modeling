@@ -307,7 +307,7 @@ qcolbot<- mapply(function(p) {
 dotpointscale = 0.75/1.35
 svglite("figures/figure_S9A.svg", width = 13*dotpointscale, height = 10*dotpointscale)
 par(mar=c(5,4,2,2)+0.1)
-hist(lethalTimingDiffs,ylim=c(0,1000),xlim=c(-0.1,0.4),breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,xlab="Difference in extinction proportions between post and premortality lethal datapoints",axes=FALSE)
+hist(lethalTimingDiffs,ylim=c(0,1000),xlim=c(-0.1,0.4),breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,xlab="Difference in extinction proportions between post- and pre-mortality lethal datapoints",axes=FALSE)
 par(new=TRUE)
 hist(2*(lethalTiminglower$extinctionRate - lethalTiminglower$expectedExtinctionRate),ylim=c(0,1000),xlim=c(-0.1,0.4),col="red",lwd =0.1,breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,axes=FALSE,xlab='',ylab='')
 par(new=TRUE)
@@ -340,7 +340,7 @@ qcolbot<- mapply(function(p) {
 dotpointscale = 0.75/1.35
 svglite("figures/figure_S9B.svg", width = 13*dotpointscale, height = 10*dotpointscale)
 par(mar=c(5,4,2,2)+0.1)
-hist(sterileTimingDiffs,ylim=c(0,1000),xlim=c(-0.1,1.0),breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,xlab="Difference in extinction proportions between post and premortality sterility datapoints",axes=FALSE)
+hist(sterileTimingDiffs,ylim=c(0,1000),xlim=c(-0.1,1.0),breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,xlab="Difference in extinction proportions between post- and pre-mortality sterile datapoints",axes=FALSE)
 par(new=TRUE)
 hist(2*(sterileTiminglower$extinctionRate - sterileTiminglower$expectedExtinctionRate),ylim=c(0,1000),xlim=c(-0.1,1.0),col="red",lwd =0.1,breaks = seq(from=-1.00125, to=1.00125, by=0.0025),main=NULL,axes=FALSE,xlab='',ylab='')
 par(new=TRUE)

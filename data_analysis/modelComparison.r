@@ -122,7 +122,7 @@ filteredSlimData <- slimData %>% filter(extinctionRate+modelDiffs/2 > 0.025,exti
 summary(filteredSlimData$modelDiffs)
 
 
-dotpointscale = 0.75/1.35
+dotpointscale = 0.75/1.35*1.05
 svglite("figures/figure_S2.svg", width = 13*dotpointscale, height = 10*dotpointscale)
 par(mar=c(5,4,2,2)+0.1)
 hist(filteredSlimData$modelDiffs,ylim=c(0,100),xlim=c(-0.5,0.2),breaks = seq(from=-0.5025, to=0.2025, by=0.005),main=NULL,xlab="Difference in extinction proportions between individual based and numerical model datapoints")

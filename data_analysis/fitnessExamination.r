@@ -83,10 +83,10 @@ custom_labels <- labeller(
 )
 
 svglite("figures/figure_S3.svg", width = 8, height = 6)
-plot<-ggplot(final_data,aes(x=startSize,y=meanFinalPercentOfFitness,group = generation,colour=generation),) +
+plot<-ggplot(final_data,aes(x=startSize,y=meanFinalPercentOfFitness,group=generation,colour=generation),) +
   # ggtitle(sprintf("%s gr=%s i=%s",title,gr,i)) +
   geom_line() + geom_point(size = 0.25) +
-  scale_color_manual(values = colors) +
+  scale_color_manual(name = "Generation",values = colors) +
   xlab("Founding population size (N(0))") +
   ylab("Mean population fitness") +
   ylim(0.0,1.0) +
@@ -94,7 +94,7 @@ plot<-ggplot(final_data,aes(x=startSize,y=meanFinalPercentOfFitness,group = gene
   theme_light() +
   theme(legend.title.align=0.5) +
   # geom_hline(yintercept = 2/3, linetype = "dashed", color = "red") +
-  facet_grid(vars(Sterile), vars(PostCompetitionMutationTiming),labeller = custom_labels) 
+  facet_grid(vars(Sterile), vars(PostCompetitionMutationTiming),labeller = custom_labels)
 print(plot)
 dev.off()
 
