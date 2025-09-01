@@ -6,8 +6,8 @@ These jobs are set up to run on the University of Melbourne's High Performance C
 
 To run a job:
 ```sh
- cd simulations
- ./slimSBatch.sh LoadedIsolatedFoundingPopulationNewGrowth/[JobName].slurm
+cd simulations
+./slimSBatch.sh LoadedIsolatedFoundingPopulationNewGrowth/[JobName].slurm
 ```
 
 ## Run data analysis/Generate base figures
@@ -15,8 +15,6 @@ Put the appropriate data from [here](https://drive.google.com/drive/folders/1GEI
 ```sh
 grep -r "figures/*" data_analysis/
 ```
-
-
 
 ## Assemble figures
 SVG output from the data_analysis code and other printed output is used to assemble the figures. Affinity designer and GIMP files used during assembly can be found in the `/figures` directory. In some cases the base SVG will need to be edited to fix imcompadibility between affinity designer and svglite.
